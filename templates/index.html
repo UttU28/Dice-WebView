@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Job Details</h1>
+        <div>
+            <h3>Title: {{ jobData.title }}</h3>
+            <p>Description: {{ jobData.description }}</p>
+            <p>Company: {{ jobData.company }}</p>
+            <p>Time of Arrival: {{ jobData.timeOfArrival }}</p>
+        </div>
+        <div class="form-container">
+            <form method="POST">
+                <input type="hidden" name="job_id" value="{{ jobData.id }}">
+                <div id="selectResume" class="selectResume hidden">
+                    <h2>Select a Resume</h2>
+                    {% for resume_id, resume_name in resumeData.items() %}
+                    <label>
+                        <input type="radio" name="resume_id" id="resume_{{ resume_id }}" value="{{ resume_id }}"> {{ resume_name }}
+                    </label>
+                    {% endfor %}
+                    <button type="submit" name="action" value="apply">Apply</button>
+                </div>
+                <div class="btn-container">
+                    <button type="button" id="showResumeBtn" onclick="toggleSelectResume()">Show Resume</button>
+                    <button type="submit" name="action" value="deny">Deny</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleSelectResume() {
+            var selectResumeDiv = document.getElementById('selectResume');
+            selectResumeDiv.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
