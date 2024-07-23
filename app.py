@@ -8,7 +8,7 @@ app = Flask(__name__)
 server = 'dice-sql.database.windows.net'
 database = 'dice_sql_database'
 
-connectionString = f'Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:{server},1433;Database={database};Uid={username};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{server},1433;Database={database};Uid={username};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
 
 jobQueue = []
 resumeData = {}
