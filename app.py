@@ -2,10 +2,10 @@ import pypyodbc as odbc
 from flask import Flask, render_template, request, redirect, url_for
 from credential import *
 from datetime import datetime, timezone
+import threading
 
 
 app = Flask(__name__)
-
 server = 'dice-sql.database.windows.net'
 database = 'dice_sql_database'
 
@@ -70,8 +70,8 @@ def addToApplyQueue(jobID, selectedResume):
         params = (jobID, timestamp, selectedResume, jobID)
         cursor.execute(query, params)
         conn.commit()
-        if cursor.rowcount != 1:
-            print(f"JobID {jobID} already exists in apply queue. No duplicate added.")
+        if cursor.rowcount != 1: print(f"JobID {jobID} already exists in apply queue. No duplicate added.")
+        else: print("Added to Apply Queue")
         cursor.close()
         conn.close()
     except odbc.Error as e:
@@ -88,8 +88,8 @@ def home():
         try:
             if action == "apply":
                 resumeID = request.form.get("resume_id")
-                addToApplyQueue(jobID, resumeID)
-            removeFromQueue(jobID)
+                threading.Thread(target=addToApplyQueue, args=(jobID, resumeID)).start()
+            threading.Thread(target=removeFromQueue, args=(jobID,)).start()
 
             jobQueue = [job for job in jobQueue if job['id'] != jobID]
         except Exception as e:
