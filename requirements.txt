@@ -1,3 +1,4 @@
 requests
 flask
 pypyodbc
+aioodbc==0.0.1
