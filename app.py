@@ -9,6 +9,8 @@ app = Flask(__name__)
 server = 'dice-sql.database.windows.net'
 database = 'dice_sql_database'
 
+# REPLACE THIS BIJSBKJFNKJBSNK JFBN:SKJFNI A: HFUNLIAUKGDKAGYDKHYAGVKHGAVKGHAKHGV
+# connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{server},1433;Database={database};Uid={username};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=5;'
 connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{server},1433;Database={database};Uid={username};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
 
 global jobQueue
@@ -93,6 +95,7 @@ def updateHTMLContent(thisDescription):
 @app.route("/", methods=["GET", "POST"])
 def home():
     global jobQueue
+    print(len(jobQueue))
 
     if request.method == "POST":
         jobID = request.form.get("job_id")
@@ -123,6 +126,5 @@ def home():
 
 if __name__ == "__main__":
     fetch_initial_data()
-    app.run(host="0.0.0.0", port=5500)
-
-    # app.run()
+    # app.run(host="0.0.0.0", port=5500)
+    app.run()
