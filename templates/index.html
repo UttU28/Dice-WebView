@@ -1,46 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Details</title>
+    <title>Job Card</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="container">
-        <h1>Job Details</h1>
-        <div>
-            <h3>Title: {{ jobData.title }}</h3>
-            <p>Description: {{ jobData.description }}</p>
-            <p>Company: {{ jobData.company }}</p>
-            <p>Time of Arrival: {{ jobData.timeOfArrival }}</p>
+    <div class="tinder">
+        <div class="tinder--status">
+            <i class="fa fa-remove"></i>
+            <i class="fa fa-heart"></i>
         </div>
-        <div class="form-container">
-            <form method="POST">
-                <input type="hidden" name="job_id" value="{{ jobData.id }}">
-                <div id="selectResume" class="selectResume hidden">
-                    <h2>Select a Resume</h2>
-                    {% for resume_id, resume_name in resumeData.items() %}
-                    <label>
-                        <input type="radio" name="resume_id" id="resume_{{ resume_id }}" value="{{ resume_id }}"> {{ resume_name }}
-                    </label>
-                    {% endfor %}
+
+
+        <form method="POST" class="card tinder--cards">
+            <div class="card tinder--card" id="jobCard">
+                <div class="card-header">
+                    <h2>{{ jobData.title }}</h2>
+                    <p>{{ jobData.company }}</p>
+                    <p id="timeAgo"></p>
+                </div>
+                <div class="card-body">
+                    <p>{{ jobData.description | safe }}</p>
+                </div>
+            </div>
+            <div class="selectResume card tinder--card hidden" id="selectResumeCard">
+                <div class="card-header">
+                    <input type="hidden" name="job_id" value="{{ jobData.id }}">
+                    <h2>Select Resume</h2>
+                    <p>Sambhal K Gandu..</p>
+                </div>
+                <div class="card-body">
+                    <div class="resume-options">
+                        {% for resume_id, resume_name in resumeData.items() %}
+                        <label class="resume-option">
+                            <input type="radio" name="resume_id" id="resume_{{ resume_id }}" value="{{ resume_id }}">
+                            <span>{{ resume_name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
                     <button type="submit" name="action" value="apply">Apply</button>
                 </div>
-                <div class="btn-container">
-                    <button type="button" id="showResumeBtn" onclick="toggleSelectResume()">Show Resume</button>
-                    <button type="submit" name="action" value="deny">Deny</button>
-                </div>
-            </form>
-        </div>
-    </div>
+            </div>
+            <div class="tinder--buttons">
+                <button id="nope" type="submit" name="action" value="deny">Deny</button>
+                <button id="love" type="button" onclick="toggleSelectResume()">Show Resume</button>
+            </div>
+        </form>
 
-    <script>
-        function toggleSelectResume() {
-            var selectResumeDiv = document.getElementById('selectResume');
-            selectResumeDiv.classList.toggle('hidden');
-        }
-    </script>
+        <script>
+            document.querySelectorAll('.resume-option').forEach(function (option) {
+                option.addEventListener('click', function () {
+                    var radio = option.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    updateApplyButtonStyle();
+                });
+            });
+
+            // Function to update Apply button style
+            function updateApplyButtonStyle() {
+                var applyButton = document.querySelector('.apply-button');
+                var isChecked = document.querySelector('input[name="resume_id"]:checked') !== null;
+                applyButton.classList.toggle('green', isChecked);
+            }
+
+            // Initial call to update Apply button style on page load
+            updateApplyButtonStyle();
+        </script>
+        <script>
+            function toggleSelectResume() {
+                var jobCard = document.getElementById('jobCard');
+                var selectResumeCard = document.getElementById('selectResumeCard');
+
+                jobCard.classList.toggle('hidden');
+                window.scrollTo(top);
+                selectResumeCard.classList.toggle('hidden');
+            }
+        </script>
+        <script>
+            // Function to calculate time ago
+            function timeAgo(timestamp) {
+                const current = new Date();
+                const previous = new Date(timestamp * 1000); // Convert UNIX timestamp to milliseconds
+                const diff = current - previous;
+
+                const seconds = Math.floor(diff / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                const days = Math.floor(hours / 24);
+
+                if (days > 0) {
+                    return days + " days ago";
+                } else if (hours > 0) {
+                    return hours + " hours ago";
+                } else if (minutes > 0) {
+                    return minutes + " minutes ago";
+                } else {
+                    return seconds + " seconds ago";
+                }
+            }
+
+            const timeOfArrival = {{ jobData.timeOfArrival }};
+            document.getElementById("timeAgo").textContent = timeAgo(timeOfArrival);
+        </script>
+    <div class="end"></div>
 </body>
+
 </html>
