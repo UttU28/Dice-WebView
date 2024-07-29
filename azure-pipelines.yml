@@ -37,3 +37,10 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+
+    - task: AzureWebAppContainer@1
+      inputs:
+        azureSubscription: 'dicePipeline'
+        appName: 'dicesaralapply'
+        containers: '$(containerRegistry)/$(imageRepository):$(tag)'
+
