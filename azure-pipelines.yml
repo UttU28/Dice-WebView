@@ -2,15 +2,16 @@ trigger:
 - main
 
 variables:
-  imageName: 'myapp'
   azureSubscription: 'dicePipeline'
-  acrName: 'myacr'
+  resourceGroupName: 'thistempresgrp'
+  acrName: 'thisacr'
   webAppName: 'dicesaralapply'
+  appServicePlanName: 'thisappserviceplan'
+  imageRepository: 'imagename'
   imageTag: 'latest'
   codeDirectory: 'src'
-  imageRepository: 'imagename'
-  containerRegistry: 'thisacr.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  containerRegistry: 'dockerSC'
   codeScanResults: 'code-scan-results.json'
   trivyResultsPath: 'trivy-results.json'
   checkovResultsPath: 'checkov-results.json'
@@ -24,7 +25,7 @@ jobs:
   - task: Docker@2
     displayName: Build and push an image to container registry
     inputs:
-      containerRegistry: 'dockerSC'
+      containerRegistry: '$(containerRegistry)'
       repository: '$(imageRepository)'
       command: 'push'
       Dockerfile: '**/Dockerfile'
@@ -72,7 +73,7 @@ jobs:
   steps:
   - script: |
       echo Scanning container image with Trivy...
-      trivy image --format json --output $(trivyResultsPath) $(acrName).azurecr.io/$(imageName):$(imageTag)
+      trivy image --format json --output $(trivyResultsPath) $(acrName).azurecr.io/$(imageRepository):$(imageTag)
     displayName: 'Run Trivy Scan'
 
   - task: PublishBuildArtifacts@1
@@ -81,28 +82,30 @@ jobs:
       ArtifactName: 'trivy-results'
       publishLocation: 'Container'
 
-# - job: ManualValidation
-#   displayName: 'Manual Validation'
-#   dependsOn: [CodeScan, CheckovScan, ContainerScan]
-#   pool:
-#     vmImage: 'ubuntu-latest'
-#   steps:
-#   - task: ManualValidation@1
-#     timeoutInMinutes: 10
-#     inputs:
-#       notifyUsers: 'utsavmaan28@gmail.com'
-#       instructions: 'Please review the scan results from CodeScan, Checkov, and Trivy before proceeding to deployment.'
+- job: CreateAppServicePlan
+  dependsOn: [CodeScan, CheckovScan, ContainerScan]
+  displayName: 'Create Azure App Service Plan'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: '$(azureSubscription)'  # Update with your Azure service connection name
+      scriptType: 'bash'
+      inlineScript: |
+        az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
+    displayName: 'Create App Service Plan'
 
 - job: DeployToACR
   displayName: 'Deploy to Azure Container Registry'
-  dependsOn: [CodeScan, CheckovScan, ContainerScan]
+  dependsOn: CreateAppServicePlan
   pool:
     vmImage: 'ubuntu-latest'
   steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
-        containerRegistry: 'dockerSC'
+        containerRegistry: '$(containerRegistry)'
         repository: '$(imageRepository)'
         command: 'push'
         Dockerfile: '**/Dockerfile'
@@ -118,7 +121,7 @@ jobs:
   - task: AzureRmWebAppDeployment@4
     inputs:
       ConnectionType: 'AzureRM'
-      azureSubscription: 'dicePipeline'
+      azureSubscription: '$(azureSubscription)'
       appType: 'webAppContainer'
       WebAppName: '$(webAppName)'
       DockerNamespace: 'thisacr'
