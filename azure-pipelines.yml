@@ -1,5 +1,6 @@
 trigger:
-- none
+- main
+# - none
 
 variables:
   azureSubscription: 'dicePipeline'
@@ -10,6 +11,7 @@ variables:
   imageRepository: 'imagename'
   imageTag: 'latest'
   codeDirectory: 'src'
+  artifactName: '$(imageRepository)_ARTIFACT'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   containerRegistry: 'dockerSC'
   codeScanResults: 'code-scan-results.json'
@@ -30,6 +32,18 @@ jobs:
       command: 'build' 
       Dockerfile: '$(dockerfilePath)'
       tags: '$(imageTag)'
+  - task: Bash@3
+    displayName: Save Docker Image
+    inputs:
+      targetType: 'inline'
+      script: |
+        docker save $(acrName).azurecr.io/$(imageRepository):$(imageTag) -o $(Pipeline.Workspace)/$(imageRepository).tar
+  - task: PublishPipelineArtifact@1
+    displayName: Publish the Artifact
+    inputs:
+      targetPath: '$(Pipeline.Workspace)/$(imageRepository).tar'
+      artifact: '$(artifactName)'
+      publishLocation: 'pipeline'
   
 - job: CreateAppServicePlan
   dependsOn: Build
@@ -38,6 +52,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
+
   - task: AzureCLI@2
     inputs:
       azureSubscription: '$(azureSubscription)'
@@ -52,13 +67,24 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifact: '$(artifactName)'
+        targetPath: '$(Pipeline.Workspace)'
+    - task: Bash@3
+      displayName: Load Docker Image
+      inputs:
+        targetType: 'inline'
+        script: |      
+          docker load --input $(Pipeline.Workspace)/$(imageRepository).tar
+          # docker tag $(acrName).azurecr.io/$(imageRepository):$(imageTag) $(acrName).azurecr.io/$(imageRepository):$(imageTag)
     - task: Docker@2
-      displayName: Build and push an image to container registry
+      displayName: Push an image to container registry
       inputs:
         containerRegistry: '$(containerRegistry)'
         repository: '$(imageRepository)'
         command: 'push'
-        Dockerfile: '**/Dockerfile'
         tags: '$(tag)'
 
 
