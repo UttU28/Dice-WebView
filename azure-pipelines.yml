@@ -1,44 +1,114 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
-- none
-
-resources:
-- repo: self
+- main
 
 variables:
-  # Container registry service connection established during pipeline creation
-  imageRepository: 'imagename'
-  containerRegistry: 'thisacr.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: 'latest'
+  imageName: 'myapp'
+  azureSubscription: 'MyAzureSubscription'
+  acrName: 'myacr'
+  webAppName: 'mywebapp'
+  dockerfilePath: 'Dockerfile'
+  imageTag: 'latest'
+  codeDirectory: 'src'
+  codeScanResults: 'code-scan-results.json'
+  trivyResultsPath: 'trivy-results.json'
+  checkovResultsPath: 'checkov-results.json'
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+jobs:
+- job: Build
+  displayName: 'Build Container Image'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'
+      addToPath: true
 
-stages:
-- stage: Build
-  displayName: Build and push stage
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        containerRegistry: 'dockerSC'
-        repository: '$(imageRepository)'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        tags: '$(tag)'
+  - script: |
+      echo Building Docker image...
+      docker build -t $(acrName).azurecr.io/$(imageName):$(imageTag) -f $(dockerfilePath) .
+    displayName: 'Build Docker Image'
 
-    - task: AzureWebAppContainer@1
-      inputs:
-        azureSubscription: 'dicePipeline'
-        appName: 'dicesaralapply'
-        containers: '$(containerRegistry)/$(imageRepository):$(tag)'
+- job: CodeScan
+  displayName: 'Scan Code with CodeScan'
+  dependsOn: Build
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: |
+      echo Scanning code with CodeScan...
+      codescan analyze --output $(codeScanResults) --source $(codeDirectory)
+    displayName: 'Run CodeScan Analysis'
 
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(codeScanResults)'
+      ArtifactName: 'code-scan-results'
+      publishLocation: 'Container'
+
+- job: CheckovScan
+  displayName: 'Scan Infrastructure as Code with Checkov'
+  dependsOn: Build
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: |
+      echo Scanning infrastructure as code with Checkov...
+      checkov -d $(codeDirectory) --output json > $(checkovResultsPath)
+    displayName: 'Run Checkov Scan'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(checkovResultsPath)'
+      ArtifactName: 'checkov-results'
+      publishLocation: 'Container'
+
+- job: ContainerScan
+  displayName: 'Scan Container Image Security with Trivy'
+  dependsOn: Build
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: |
+      echo Scanning container image with Trivy...
+      trivy image --format json --output $(trivyResultsPath) $(acrName).azurecr.io/$(imageName):$(imageTag)
+    displayName: 'Run Trivy Scan'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(trivyResultsPath)'
+      ArtifactName: 'trivy-results'
+      publishLocation: 'Container'
+
+- job: ManualValidation
+  displayName: 'Manual Validation'
+  dependsOn: [CodeScan, CheckovScan, ContainerScan]
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: ManualValidation@0
+    inputs:
+      instructions: 'Please review the scan results from CodeScan, Checkov, and Trivy before proceeding to deployment.'
+
+- job: DeployToACR
+  displayName: 'Deploy to Azure Container Registry'
+  dependsOn: ManualValidation
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: |
+      echo Pushing Docker image to ACR...
+      docker push $(acrName).azurecr.io/$(imageName):$(imageTag)
+    displayName: 'Push Docker Image to ACR'
+
+- job: DeployToWebApp
+  displayName: 'Deploy to Azure Web App'
+  dependsOn: DeployToACR
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: '$(azureSubscription)'
+      appName: '$(webAppName)'
+      dockerImageName: '$(acrName).azurecr.io/$(imageName):$(imageTag)'
