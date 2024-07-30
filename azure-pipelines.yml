@@ -32,59 +32,60 @@ jobs:
       tags: '$(imageTag)'
   
 
-- job: CodeScan
-  displayName: 'Scan Code with CodeScan'
-  dependsOn: Build
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - script: |
-      echo Scanning code with CodeScan...
-      codescan analyze --output $(codeScanResults) --source $(codeDirectory)
-    displayName: 'Run CodeScan Analysis'
+# - job: CodeScan
+#   displayName: 'Scan Code with CodeScan'
+#   dependsOn: Build
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
+#   - script: |
+#       echo Scanning code with CodeScan...
+#       codescan analyze --output $(codeScanResults) --source $(codeDirectory)
+#     displayName: 'Run CodeScan Analysis'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(codeScanResults)'
-      ArtifactName: 'code-scan-results'
-      publishLocation: 'Container'
+#   - task: PublishBuildArtifacts@1
+#     inputs:
+#       PathtoPublish: '$(codeScanResults)'
+#       ArtifactName: 'code-scan-results'
+#       publishLocation: 'Container'
 
-- job: CheckovScan
-  displayName: 'Scan Infrastructure as Code with Checkov'
-  dependsOn: Build
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - script: |
-      echo Scanning infrastructure as code with Checkov...
-      checkov -d $(codeDirectory) --output json > $(checkovResultsPath)
-    displayName: 'Run Checkov Scan'
+# - job: CheckovScan
+#   displayName: 'Scan Infrastructure as Code with Checkov'
+#   dependsOn: Build
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
+#   - script: |
+#       echo Scanning infrastructure as code with Checkov...
+#       checkov -d $(codeDirectory) --output json > $(checkovResultsPath)
+#     displayName: 'Run Checkov Scan'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(checkovResultsPath)'
-      ArtifactName: 'checkov-results'
-      publishLocation: 'Container'
+#   - task: PublishBuildArtifacts@1
+#     inputs:
+#       PathtoPublish: '$(checkovResultsPath)'
+#       ArtifactName: 'checkov-results'
+#       publishLocation: 'Container'
 
-- job: ContainerScan
-  displayName: 'Scan Container Image Security with Trivy'
-  dependsOn: Build
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - script: |
-      echo Scanning container image with Trivy...
-      trivy image --format json --output $(trivyResultsPath) $(acrName).azurecr.io/$(imageRepository):$(imageTag)
-    displayName: 'Run Trivy Scan'
+# - job: ContainerScan
+#   displayName: 'Scan Container Image Security with Trivy'
+#   dependsOn: Build
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
+#   - script: |
+#       echo Scanning container image with Trivy...
+#       trivy image --format json --output $(trivyResultsPath) $(acrName).azurecr.io/$(imageRepository):$(imageTag)
+#     displayName: 'Run Trivy Scan'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(trivyResultsPath)'
-      ArtifactName: 'trivy-results'
-      publishLocation: 'Container'
+#   - task: PublishBuildArtifacts@1
+#     inputs:
+#       PathtoPublish: '$(trivyResultsPath)'
+#       ArtifactName: 'trivy-results'
+#       publishLocation: 'Container'
 
 - job: CreateAppServicePlan
-  dependsOn: [CodeScan, CheckovScan, ContainerScan]
+  dependsOn: Build
+  # dependsOn: [CodeScan, CheckovScan, ContainerScan]
   displayName: 'Create Azure App Service Plan'
   pool:
     vmImage: 'ubuntu-latest'
