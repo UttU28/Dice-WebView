@@ -27,9 +27,10 @@ jobs:
     inputs:
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageRepository)'
-      command: 'push'
-      Dockerfile: '**/Dockerfile'
-      tags: '$(tag)'
+      command: 'build' 
+      Dockerfile: '$(dockerfilePath)'
+      tags: '$(imageTag)'
+  
 
 - job: CodeScan
   displayName: 'Scan Code with CodeScan'
