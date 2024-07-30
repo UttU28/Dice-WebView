@@ -3,12 +3,14 @@ trigger:
 
 variables:
   imageName: 'myapp'
-  azureSubscription: 'MyAzureSubscription'
+  azureSubscription: 'dicePipeline'
   acrName: 'myacr'
-  webAppName: 'mywebapp'
-  dockerfilePath: 'Dockerfile'
+  webAppName: 'dicesaralapply'
   imageTag: 'latest'
   codeDirectory: 'src'
+  imageRepository: 'imagename'
+  containerRegistry: 'thisacr.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   codeScanResults: 'code-scan-results.json'
   trivyResultsPath: 'trivy-results.json'
   checkovResultsPath: 'checkov-results.json'
@@ -19,15 +21,14 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - task: UsePythonVersion@0
+  - task: Docker@2
+    displayName: Build and push an image to container registry
     inputs:
-      versionSpec: '3.x'
-      addToPath: true
-
-  - script: |
-      echo Building Docker image...
-      docker build -t $(acrName).azurecr.io/$(imageName):$(imageTag) -f $(dockerfilePath) .
-    displayName: 'Build Docker Image'
+      containerRegistry: 'dockerSC'
+      repository: '$(imageRepository)'
+      command: 'push'
+      Dockerfile: '**/Dockerfile'
+      tags: '$(tag)'
 
 - job: CodeScan
   displayName: 'Scan Code with CodeScan'
@@ -80,26 +81,33 @@ jobs:
       ArtifactName: 'trivy-results'
       publishLocation: 'Container'
 
-- job: ManualValidation
-  displayName: 'Manual Validation'
+# - job: ManualValidation
+#   displayName: 'Manual Validation'
+#   dependsOn: [CodeScan, CheckovScan, ContainerScan]
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
+#   - task: ManualValidation@1
+#     timeoutInMinutes: 10
+#     inputs:
+#       notifyUsers: 'utsavmaan28@gmail.com'
+#       instructions: 'Please review the scan results from CodeScan, Checkov, and Trivy before proceeding to deployment.'
+
+- job: DeployToACR
+  displayName: 'Deploy to Azure Container Registry'
   dependsOn: [CodeScan, CheckovScan, ContainerScan]
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - task: ManualValidation@0
-    inputs:
-      instructions: 'Please review the scan results from CodeScan, Checkov, and Trivy before proceeding to deployment.'
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        containerRegistry: 'dockerSC'
+        repository: '$(imageRepository)'
+        command: 'push'
+        Dockerfile: '**/Dockerfile'
+        tags: '$(tag)'
 
-- job: DeployToACR
-  displayName: 'Deploy to Azure Container Registry'
-  dependsOn: ManualValidation
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - script: |
-      echo Pushing Docker image to ACR...
-      docker push $(acrName).azurecr.io/$(imageName):$(imageTag)
-    displayName: 'Push Docker Image to ACR'
 
 - job: DeployToWebApp
   displayName: 'Deploy to Azure Web App'
@@ -107,8 +115,12 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - task: AzureWebApp@1
+  - task: AzureRmWebAppDeployment@4
     inputs:
-      azureSubscription: '$(azureSubscription)'
-      appName: '$(webAppName)'
-      dockerImageName: '$(acrName).azurecr.io/$(imageName):$(imageTag)'
+      ConnectionType: 'AzureRM'
+      azureSubscription: 'dicePipeline'
+      appType: 'webAppContainer'
+      WebAppName: '$(webAppName)'
+      DockerNamespace: 'thisacr'
+      DockerRepository: 'dicecontainer'
+      DockerImageTag: '$(imageTag)'
