@@ -92,10 +92,10 @@ jobs:
   steps:
   - task: AzureCLI@2
     inputs:
-      azureSubscription: '$(azureSubscription)'  # Update with your Azure service connection name
+      azureSubscription: '$(azureSubscription)'
       scriptType: 'bash'
-      inlineScript: |
-        az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
+      scriptLocation: 'inlineScript'
+      inlineScript: 'az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux'
     displayName: 'Create App Service Plan'
 
 - job: DeployToACR
