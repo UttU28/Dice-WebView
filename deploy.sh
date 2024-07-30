@@ -31,8 +31,9 @@ RESOURCE_ID=$(az group show --resource-group $RESOURCE_GROUP_NAME --query id --o
 echo $RESOURCE_ID
 
 
+RESOURCE_GROUP_NAME='thisresourcegroup'
 APP_SERVICE_PLAN_NAME='thatappserviceplan'
-az appservice plan create --name $APP_SERVICE_PLAN_NAME --resource-group $RESOURCE_GROUP_NAME --sku B1 --is-linux
+az appservice plan create --name thatappserviceplan --resource-group thisresourcegroup --sku B1 --is-linux
 
 APP_SERVICE_NAME='dicesaralapply'
 REGISTRY_NAME='thisacr'
