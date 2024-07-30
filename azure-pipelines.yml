@@ -8,10 +8,11 @@ variables:
   acrName: 'thisacr'
   webAppName: 'dicesaralapply'
   appServicePlanName: 'thisappserviceplan'
-  imageRepository: 'imagename'
+  imageName: 'imagename'
   imageTag: 'latest'
+  imageRepository: '$(acrName).azurecr.io/$(imageName):$(imageTag)'
   codeDirectory: 'src'
-  artifactName: '$(imageRepository)_ARTIFACT'
+  artifactName: '$(imageName)_ARTIFACT'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   containerRegistry: 'dockerSC'
   codeScanResults: 'code-scan-results.json'
@@ -44,11 +45,11 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
-        docker save $(acrName).azurecr.io/$(imageRepository):$(imageTag) -o $(Pipeline.Workspace)/$(imageRepository).tar
+        docker save $(imageRepository) -o $(Pipeline.Workspace)/$(imageName).tar
   - task: PublishPipelineArtifact@1
     displayName: Publish the Artifact
     inputs:
-      targetPath: '$(Pipeline.Workspace)/$(imageRepository).tar'
+      targetPath: '$(Pipeline.Workspace)/$(imageName).tar'
       artifact: '$(artifactName)'
       publishLocation: 'pipeline'
   
@@ -85,8 +86,8 @@ jobs:
       inputs:
         targetType: 'inline'
         script: |      
-          docker load --input $(Pipeline.Workspace)/$(imageRepository).tar
-          docker tag $(acrName).azurecr.io/$(imageRepository):$(imageTag) $(acrName).azurecr.io/$(imageRepository):$(imageTag)
+          docker load --input $(Pipeline.Workspace)/$(imageName).tar
+          # docker tag $(imageRepository) $(imageRepository)
     - task: Docker@2
       displayName: Push an image to container registry
       inputs:
