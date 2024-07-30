@@ -45,25 +45,26 @@ jobs:
       artifact: '$(artifactName)'
       publishLocation: 'pipeline'
   
-- job: CreateAppServicePlan
-  dependsOn: Build
-  # dependsOn: [CodeScan, CheckovScan, ContainerScan]
-  displayName: 'Create Azure App Service Plan'
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
+# - job: CreateAppServicePlan
+#   dependsOn: Build
+#   # dependsOn: [CodeScan, CheckovScan, ContainerScan]
+#   displayName: 'Create Azure App Service Plan'
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
 
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: '$(azureSubscription)'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: 'az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux'
-    displayName: 'Create App Service Plan'
+#   - task: AzureCLI@2
+#     inputs:
+#       azureSubscription: '$(azureSubscription)'
+#       scriptType: 'bash'
+#       scriptLocation: 'inlineScript'
+#       inlineScript: 'az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux'
+#     displayName: 'Create App Service Plan'
 
 - job: DeployToACR
   displayName: 'Deploy to Azure Container Registry'
-  dependsOn: CreateAppServicePlan
+  dependsOn: Build
+  # dependsOn: CreateAppServicePlan
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -78,7 +79,7 @@ jobs:
         targetType: 'inline'
         script: |      
           docker load --input $(Pipeline.Workspace)/$(imageRepository).tar
-          # docker tag $(acrName).azurecr.io/$(imageRepository):$(imageTag) $(acrName).azurecr.io/$(imageRepository):$(imageTag)
+          docker tag $(acrName).azurecr.io/$(imageRepository):$(imageTag) $(acrName).azurecr.io/$(imageRepository):$(imageTag)
     - task: Docker@2
       displayName: Push an image to container registry
       inputs:
