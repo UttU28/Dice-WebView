@@ -30,7 +30,7 @@ jobs:
     inputs:
       containerRegistry: '$(containerRegistry)'
       repository: '$(imageRepository)'
-      command: 'build' 
+      command: buildAndPush 
       Dockerfile: '$(dockerfilePath)'
       tags: '$(imageTag)'
   - task: Docker@2
