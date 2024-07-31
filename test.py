@@ -1,15 +1,36 @@
-import re
-keyWords = ['Snowflake', 'MongoDB', 'Azure VM', 'Logging', 'APIs', 'Kubernetes', 'Data Lakes', 'Postman', 'Extract', 'GCP Firebase', 'Apache Hadoop', 'JFrog Artifactory', 'AWS', 'Pipelines', 'Security vulnerability management', 'AngularJS', 'Azure SQL Database', 'Burp Suite', 'Bootstrap', 'Kali Linux', 'Monitoring tools', 'Apache Airflow', 'Google Cloud Platform', 'Angular', 'PyTorch', 'Scripting languages', 'AWS S3', 'Load', 'DataBricks', 'Linux shell scripting', 'Continuous Integration/Continuous Delivery', 'Groovy scripts', 'New Relic', 'Node.js', 'Azure Blob Storage', 'Docker containers', 'OWASP ZAP', 'Lean principles', 'ETL', 'Hibernate', 'Continuous Delivery', 'Continuous Improvement', 'Orchestration', 'AWS RDS', 'Java', 'Azure DevOps', 'Oracle', 'Puppet', 'Nagios', 'Grafana', 'Encryption methods', 'C#', 'Cassandra', 'Express.js', 'Data lineage', 'Apache Spark', 'JSON', 'PHP', 'GitOps', 'CI/CD', 'GitHub Actions', 'Blue-Green deployment', 'Mobile Device development', 'Data privacy', 'SQL', 'Agile', 'Python', 'Azure certifications', 'Django', 'ELK Stack', 'NGINX', 'React.js', 'Slack', 'NoSQL', 'Material UI', 'Compliance measures', 'Kibana', 'Scrum', 'GCP Cloud SQL', 'Azure Functions', 'SQL Server', 'Data governance', 'MySQL', 'Elasticsearch', 'Veracode', 'Azure Cosmos DB', 'REST APIs', 'Maven', 'Software Quality Assurance', 'Ansible', 'Microservices architecture', 'JavaScript', 'Windows PowerShell', 'Microservices', 'Vue.js', 'Nessus', 'Apache HTTP Server', 'Flask', 'RESTful APIs', 'Cloud computing', 'React', 'AWS Lambda', 'Azure services', 'ASP.NET', 'AWS services', 'TypeScript', 'Bash scripting', 'TensorFlow', 'Penetration testing', 'HTML', 'Powershell', 'Delta Lake', 'AWS EKS', 'Infrastructure as Code', 'CSS', 'Spring Boot', 'Splunk', 'GCP', 'Fortify', 'Spring Framework', 'ITIL', 'AWS CloudFormation', 'Apache Tomcat', 'NUnit', 'Azure Kubernetes Service', 'Transform', 'Docker', 'XML', 'Data Warehousing', 'Kanban', 'Data cataloging', 'AWS ECS', 'GCP Cloud Functions', 'Shift Left Security', 'Apache Kafka', 'Serverless architecture', 'Amazon Web Services', 'SOAP', 'Vulnerability management', 'Datadog', 'Bash', 'Containerization', 'Configuration management', 'GCP Compute Engine', 'JUnit', 'Continuous Integration', 'Network security', 'SonarQube', 'Canary deployment', 'GraphQL', '.NET Framework', 'PostgreSQL', 'OAuth', 'RESTful web services', 'DevSecOps', 'DevOps', 'Penetration Testing', 'Terraform', 'Git', 'Unix shell scripting', 'JIRA', 'Ruby on Rails', 'BigQuery', 'TestNG', 'Data warehousing', 'Power BI', 'GitHub', 'NoSQL databases', 'Metasploit', 'Prometheus', '.NET Core', 'Agile development', 'AWS DynamoDB', 'Identity and access management', 'Secure data communication', 'Bitbucket', 'Data analytics', 'AWS EC2', 'Chef', 'Next.js', 'GCP Cloud Storage', 'Azure security', 'GCP Kubernetes Engine', 'Six Sigma', 'Entity Framework', 'Cucumber', 'Jenkins', 'Confluence', 'Logstash', 'Appium', 'SDLC', 'JWT', 'Observability', 'YAML', 'Serverless architectures', 'Selenium', 'Redis', 'GitLab', 'Metadata management', 'Business intelligence']
+import os
+from azure.keyvault.secrets import SecretClient
+from azure.identity import DefaultAzureCredential
 
-myText = "Hey this is Utsa, I am interest in AWS and AWS EC2 instances, I wanna learn about HTTP and Flask with python as well with GCP Cloud Storage"
+KVUri = f"https://thisdicekeyvault.vault.azure.net"
 
-lowercase_keywords = sorted([kw.lower() for kw in keyWords], key=len, reverse=True)
-pattern = re.compile(r'\b(' + '|'.join(map(re.escape, lowercase_keywords)) + r')\b', re.IGNORECASE)
+credential = DefaultAzureCredential()
+client = SecretClient(vault_url=KVUri, credential=credential)
 
-def replace_keywords(match):
-    keyword = match.group(0)
-    return f"<span class='keyWord'>{keyword}</span>"
+allSecrets = {
+    # "backend-rg": "thisstoragerg",
+    # "backend-storage": "dicestorage02",
+    # "backend-container": "13form",
+    # "backend-webapp": "webappState",
+    # "general-location": "East US",
+    # "backend-datascraping": "datascrapingState",
+    # "webapp-rg": "this-dice-webapp-rg",
+    # "webapp-service-plan": "this-dice-webapp-service-plan",
+    # "webapp-name": "dicesaralapply",
+    # "webapp-image": "dicewebview",
+    # "acrName": "thisacr",
+    # "acrPassword": "U9+ivfherZPq3+UWDnj1fxftpOqWUgXqspIc90YYFI+ACRBkerUy"
+    # "webapp": "sdv",
+    # "sdv": "sdv",
+    # "sdv": "sdv",
+    # "sdv": "sdv",
+    # "sdv": "sdv",
+    # "sdv": "sdv",
+}
 
-myText = pattern.sub(replace_keywords, myText)
+for secretsKey, secretsValue in allSecrets.items():
+    print(secretsKey, secretsValue)
+    client.set_secret(str(secretsKey), str(secretsValue))
 
-print(myText)
+
+print(" done.")
