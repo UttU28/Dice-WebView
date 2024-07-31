@@ -13,13 +13,8 @@
 
 <body>
     <div class="tinder">
-        <div class="tinder--status">
-            <i class="fa fa-remove"></i>
-            <i class="fa fa-heart"></i>
-        </div>
-
-
         <form method="POST" class="card tinder--cards">
+            <div class="totalCount">Count: {{ pendingJobs }}</div>
             <div class="card tinder--card" id="jobCard">
                 <div class="card-header">
                     <h2>{{ jobData.title }}</h2>

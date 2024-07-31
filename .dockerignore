@@ -30,3 +30,9 @@ Dockerfile
 *.tmp
 *.pdf
 *.yml
+
+allResume/
+.gitignore
+deploy.sh
+
+*.sql

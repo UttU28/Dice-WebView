@@ -8,7 +8,7 @@ variables:
   acrName: 'thisacr'
   webAppName: 'dicesaralapply1232'
   appServicePlanName: 'thisappserviceplan'
-  imageName: 'dicecontainer'
+  imageName: 'dicewebview'
   imageTag: 'latest'
   imageRepository: '$(acrName).azurecr.io/$(imageName)'
   codeDirectory: 'src'
@@ -22,124 +22,79 @@ variables:
   checkovResultsPath: 'checkov-results.json'
 
 jobs:
-# - job: Build
-#   displayName: 'Build Container Image'
-#   pool:
-#     vmImage: 'ubuntu-latest'
-#   steps:
-#   - task: Docker@2
-#     displayName: Build and push an image to container registry
-#     inputs:
-#       containerRegistry: '$(containerRegistry)'
-#       repository: '$(imageName)'
-#       command: build
-#       Dockerfile: '$(dockerfilePath)'
-#       tags: '$(imageTag)art'
-#   # - task: Docker@2
-#   #   displayName: Push an image to container registry
-#   #   inputs:
-#   #     containerRegistry: '$(containerRegistry)'
-#   #     repository: '$(imageRepository)'
-#   #     command: 'push'
-#   #     tags: '$(tag)'
-#   - task: Bash@3
-#     displayName: Save Docker Image
-#     inputs:
-#       targetType: 'inline'
-#       script: |
-#         docker save $(imageRepository):$(imageTag)art -o $(Pipeline.Workspace)/$(imageName).tar
-#   - task: PublishPipelineArtifact@1
-#     displayName: Publish the Artifact
-#     inputs:
-#       targetPath: '$(Pipeline.Workspace)/$(imageName).tar'
-#       artifact: '$(artifactName)'
-#       publishLocation: 'pipeline'
-  
-- job: CreateAppServicePlan
-  # dependsOn: Build
-  # dependsOn: [CodeScan, CheckovScan, ContainerScan]
-  displayName: 'Create Azure App Service Plan'
+- job: Build
+  displayName: 'Build Container Image'
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-
-  - task: AzureCLI@2
+  - task: Docker@2
+    displayName: Build and push an image to container registry
     inputs:
-      azureSubscription: '$(azureSubscription)'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
-        az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --role acrpull
-        #  --container-image-name $(imageRepository)
-        az webapp config set --resource-group $(resourceGroupName) --name $(webAppName) --generic-configurations '{"acrUseManagedIdentityCreds": true}'
-
-        az webapp config container set --name $(webAppName) --resource-group $(resourceGroupName) --container-image-name $(imageRepository)
-    displayName: 'Create App Service Plan'
-
-# - job: DeployToACR
-#   displayName: 'Deploy to Azure Container Registry'
+      containerRegistry: '$(containerRegistry)'
+      repository: '$(imageName)'
+      command: build
+      Dockerfile: '$(dockerfilePath)'
+      tags: '$(imageTag)art'
+  - task: Bash@3
+    displayName: Save Docker Image
+    inputs:
+      targetType: 'inline'
+      script: |
+        docker save $(imageRepository):$(imageTag)art -o $(Pipeline.Workspace)/$(imageName).tar
+  - task: PublishPipelineArtifact@1
+    displayName: Publish the Artifact
+    inputs:
+      targetPath: '$(Pipeline.Workspace)/$(imageName).tar'
+      artifact: '$(artifactName)'
+      publishLocation: 'pipeline'
+  
+# - job: CreateAppServicePlan
 #   # dependsOn: Build
-#   dependsOn: CreateAppServicePlan
+#   # dependsOn: [CodeScan, CheckovScan, ContainerScan]
+#   displayName: 'Create Azure App Service Plan'
 #   pool:
 #     vmImage: 'ubuntu-latest'
 #   steps:
-#     - task: DownloadPipelineArtifact@2
-#       inputs:
-#         buildType: 'current'
-#         artifact: '$(artifactName)'
-#         targetPath: '$(Pipeline.Workspace)'
-#     - task: Bash@3
-#       displayName: Load Docker Image
-#       inputs:
-#         targetType: 'inline'
-#         script: |      
-#           docker load --input $(Pipeline.Workspace)/$(imageName).tar
-#           docker tag $(imageRepository):$(imageTag)art $(imageRepository):$(imageTag)
-#     - task: Docker@2
-#       displayName: Push an image to container registry
-#       inputs:
-#         containerRegistry: '$(containerRegistry)'
-#         repository: '$(imageName)'
-#         command: push
-#         Dockerfile: '$(dockerfilePath)'
-#         tags: '$(imageTag)'
 
-
-# - job: DeployToWebApp
-#   displayName: 'Deploy to Azure Web App'
-#   # dependsOn: DeployToACR
-#   pool:
-#     vmImage: 'ubuntu-latest'
-#   steps:
-#   - task: AzureRmWebAppDeployment@4
+#   - task: AzureCLI@2
 #     inputs:
-#       ConnectionType: 'AzureRM'
 #       azureSubscription: '$(azureSubscription)'
-#       appType: 'webAppContainer'
-#       WebAppName: '$(webAppName)'
-#       DockerNamespace: 'thisacr'
-#       DockerRepository: 'dicecontainer'
-#       DockerImageTag: '$(imageTag)'
+#       scriptType: 'bash'
+#       scriptLocation: 'inlineScript'
+#       inlineScript: |
+#         az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
+#         az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --role acrpull
+#         #  --container-image-name $(imageRepository)
+#         az webapp config set --resource-group $(resourceGroupName) --name $(webAppName) --generic-configurations '{"acrUseManagedIdentityCreds": true}'
 
+#         az webapp config container set --name $(webAppName) --resource-group $(resourceGroupName) --container-image-name $(imageRepository)
+#     displayName: 'Create App Service Plan'
 
-  # - task: AzureContainerApps@1
-  #   inputs:
-  #     appSourcePath: '$(Build.SourcesDirectory)/'
-  #     azureSubscription: '$(azureSubscription)' # Required
-  #     acrName: '$(acrName)' # Placeholder or actual name
-  #     acrUsername: '$(acrName)' # Optional placeholder
-  #     acrPassword: '$(acrPassword)' # Optional placeholder
-  #     dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile' # Optional placeholder
-  #     # containerAppEnvironment: 'idkisthistheplaceholderithink' # Optional placeholder
-  #     imageToDeploy: '$(imageName):$(imageTag)' # Placeholder or actual image name
-  #     containerAppName: '$(webAppName)' # Placeholder or actual name
-  #     resourceGroup: '$(resourceGroupName)' # Placeholder or actual group name
-  #     runtimeStack: "PYTHON|3.9"
-  #     targetPort: 50505
-  #     ingress: external
-    
+- job: DeployToACR
+  displayName: 'Deploy to Azure Container Registry'
+  dependsOn: Build
+  # dependsOn: CreateAppServicePlan
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifact: '$(artifactName)'
+        targetPath: '$(Pipeline.Workspace)'
+    - task: Bash@3
+      displayName: Load Docker Image
+      inputs:
+        targetType: 'inline'
+        script: |      
+          docker load --input $(Pipeline.Workspace)/$(imageName).tar
+          docker tag $(imageRepository):$(imageTag)art $(imageRepository):$(imageTag)
+    - task: Docker@2
+      displayName: Push an image to container registry
+      inputs:
+        containerRegistry: '$(containerRegistry)'
+        repository: '$(imageName)'
+        command: push
+        Dockerfile: '$(dockerfilePath)'
+        tags: '$(imageTag)'
 
-  #     az containerapp up \
-  # --resource-group web-flask-aca-rg --name web-aca-app \
-  # --ingress external --target-port 50505 --source .

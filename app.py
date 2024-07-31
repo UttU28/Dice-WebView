@@ -2,7 +2,6 @@ import pypyodbc as odbc
 from flask import Flask, render_template, request, redirect, url_for
 from credential import *
 from datetime import datetime, timezone
-import threading
 import re
 
 app = Flask(__name__)
@@ -25,7 +24,7 @@ def fetch_initial_data():
 
         # Fetch job queue
         query = """
-            SELECT allData.id, allData.title, allData.description, allData.company, myQueue.timeOfArrival 
+            SELECT TOP 20 allData.id, allData.title, allData.description, allData.company, myQueue.timeOfArrival 
             FROM myQueue 
             JOIN allData ON myQueue.id = allData.id 
             ORDER BY myQueue.timeOfArrival DESC
@@ -64,13 +63,17 @@ def addToApplyQueue(jobID, selectedResume):
         conn = odbc.connect(connectionString)
         cursor = conn.cursor()
         timestamp = int(datetime.now(timezone.utc).timestamp())
-        query = """INSERT INTO applyQueue (id, timeOfArrival, selectedResume)
-                    SELECT ?, ?, ?
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM applyQueue WHERE id = ?
-                    )"""
+        query = """
+            INSERT INTO applyQueue (id, timeOfArrival, selectedResume)
+            SELECT ?, ?, ?
+            WHERE NOT EXISTS (
+                SELECT 1 FROM applyQueue WHERE id = ?
+            );
+        """
         params = (jobID, timestamp, selectedResume, jobID)
         cursor.execute(query, params)
+        query = "DELETE FROM myQueue WHERE id = ?"
+        cursor.execute(query, [jobID])
         conn.commit()
         if cursor.rowcount != 1: print(f"JobID {jobID} already exists in apply queue. No duplicate added.")
         else: print("Added to Apply Queue")
@@ -95,7 +98,6 @@ def updateHTMLContent(thisDescription):
 @app.route("/", methods=["GET", "POST"])
 def home():
     global jobQueue
-    print(len(jobQueue))
 
     if request.method == "POST":
         jobID = request.form.get("job_id")
@@ -105,8 +107,8 @@ def home():
             if action == "apply":
                 resumeID = request.form.get("resume_id")
                 # print(jobID, resumeID)
-                threading.Thread(target=addToApplyQueue, args=(jobID, resumeID)).start()
-            threading.Thread(target=removeFromQueue, args=(jobID,)).start()
+                addToApplyQueue(jobID, resumeID)
+            else: removeFromQueue(jobID)
 
             jobQueue = [job for job in jobQueue if job['id'] != jobID]
         except Exception as e:
@@ -119,10 +121,10 @@ def home():
     tempDesc = thisQueue["description"]
     tempDesc = updateHTMLContent(tempDesc)
     thisQueue["description"] = tempDesc
-    print(resumeData)
+    # print(resumeData)
     # print(tempDesc)
     # print(thisQueue)
-    return render_template("index.html", jobData=thisQueue, resumeData=resumeData)
+    return render_template("index.html", jobData=thisQueue, resumeData=resumeData, pendingJobs=len(jobQueue))
 
 if __name__ == "__main__":
     fetch_initial_data()
