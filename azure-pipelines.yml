@@ -109,7 +109,14 @@ jobs:
       displayName: Install Terraform
 
     - task: TerraformCLI@1
-      displayName: 'terraform plan'
+      displayName: 'INTI'
+      inputs:
+        command: init
+        environmentServiceName: 'dicePipeline'
+
+
+    - task: TerraformCLI@1
+      displayName: 'PLAN'
       inputs:
         command: plan
         environmentServiceName: 'dicePipeline'
