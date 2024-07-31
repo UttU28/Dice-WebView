@@ -1,3 +1,18 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=3.0.0"
+    }
+  }
+  backend "azurerm" {
+    resource_group_name  = "thisstoragerg"
+    storage_account_name = "dicestorage02"
+    container_name       = "13form"
+    key                  = "tfstatedice"
+  }
+}
+
 provider "azurerm" {
   features {}
 }
@@ -24,7 +39,7 @@ resource "azurerm_linux_web_app" "example" {
   site_config {
     always_on = true
     application_stack {
-      docker_image_name        = "thisacr.azurecr.io/imagename:latest"
+      docker_image_name        = "thisacr.azurecr.io/dicewebview:latest"
       docker_registry_username = "thisacr"
       docker_registry_password = "U9+ivfherZPq3+UWDnj1fxftpOqWUgXqspIc90YYFI+ACRBkerUy"
     }
