@@ -27,7 +27,7 @@ resource "azurerm_resource_group" "example" {
 
 resource "azurerm_service_plan" "example" {
   name                = local.webapp-service-plan
-  resource_group_name = data.azurerm_resource_group.example.name
+  resource_group_name = azurerm_resource_group.example.name
   location            = local.general-location
   os_type             = "Linux"
   sku_name            = "B1"
@@ -35,7 +35,7 @@ resource "azurerm_service_plan" "example" {
 
 resource "azurerm_linux_web_app" "example" {
   name                = local.webapp-name
-  resource_group_name = data.azurerm_resource_group.example.name
+  resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_service_plan.example.location
   service_plan_id     = azurerm_service_plan.example.id
 
@@ -57,7 +57,7 @@ resource "null_resource" "restart_web_app" {
     command = <<EOT
     sleep 60
 
-    az webapp restart --resource-group ${data.azurerm_resource_group.example.name} --name ${azurerm_linux_web_app.example.name}
+    az webapp restart --resource-group ${azurerm_resource_group.example.name} --name ${azurerm_linux_web_app.example.name}
     EOT
   }
 }
