@@ -51,6 +51,8 @@ resource "null_resource" "restart_web_app" {
 
   provisioner "local-exec" {
     command = <<EOT
+    sleep 60
+
     az webapp restart --resource-group ${data.azurerm_resource_group.example.name} --name ${azurerm_linux_web_app.example.name}
     EOT
   }
