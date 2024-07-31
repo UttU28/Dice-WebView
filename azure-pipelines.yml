@@ -69,8 +69,8 @@ jobs:
       scriptLocation: 'inlineScript'
       inlineScript: |
         # az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
-        az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --scope /subscriptions/$(subscriptionID)/resourceGroups/$(resourceGroupName) --role acrpull --runtime "PYTHON|3.9" 
-        az webapp config container set --name $(webAppName)1 --resource-group $(resourceGroupName) --docker-custom-image-name $(imageRepository)
+        # az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --scope /subscriptions/$(subscriptionID)/resourceGroups/$(resourceGroupName) --role acrpull --runtime "PYTHON|3.9" 
+        az webapp config container set --name $(webAppName) --resource-group $(resourceGroupName) --docker-custom-image-name $(imageRepository)
     displayName: 'Create App Service Plan'
 
 - job: DeployToACR
