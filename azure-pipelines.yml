@@ -55,24 +55,26 @@ jobs:
 #       artifact: '$(artifactName)'
 #       publishLocation: 'pipeline'
   
-# - job: CreateAppServicePlan
-#   # dependsOn: Build
-#   # dependsOn: [CodeScan, CheckovScan, ContainerScan]
-#   displayName: 'Create Azure App Service Plan'
-#   pool:
-#     vmImage: 'ubuntu-latest'
-#   steps:
+- job: CreateAppServicePlan
+  # dependsOn: Build
+  # dependsOn: [CodeScan, CheckovScan, ContainerScan]
+  displayName: 'Create Azure App Service Plan'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
 
-  # - task: AzureCLI@2
-  #   inputs:
-  #     azureSubscription: '$(azureSubscription)'
-  #     scriptType: 'bash'
-  #     scriptLocation: 'inlineScript'
-  #     inlineScript: |
-  #       # az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
-  #       # az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --scope /subscriptions/$(subscriptionID)/resourceGroups/$(resourceGroupName) --role acrpull --runtime "PYTHON|3.9" 
-  #       az webapp config container set --name $(webAppName) --resource-group $(resourceGroupName) --container-image-name $(imageRepository)
-  #   displayName: 'Create App Service Plan'
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: '$(azureSubscription)'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
+        az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --scope /subscriptions/$(subscriptionID)/resourceGroups/$(resourceGroupName) --role acrpull --runtime "PYTHON|3.9" --container-image-name $(imageRepository)
+        az webapp config set --resource-group $(resourceGroupName) --name $(webAppName) --generic-configurations '{"acrUseManagedIdentityCreds": true}'
+
+        # az webapp config container set --name $(webAppName) --resource-group $(resourceGroupName) --container-image-name $(imageRepository)
+    displayName: 'Create App Service Plan'
 
 # - job: DeployToACR
 #   displayName: 'Deploy to Azure Container Registry'
@@ -103,12 +105,12 @@ jobs:
 #         tags: '$(imageTag)'
 
 
-- job: DeployToWebApp
-  displayName: 'Deploy to Azure Web App'
-  # dependsOn: DeployToACR
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
+# - job: DeployToWebApp
+#   displayName: 'Deploy to Azure Web App'
+#   # dependsOn: DeployToACR
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
 #   - task: AzureRmWebAppDeployment@4
 #     inputs:
 #       ConnectionType: 'AzureRM'
@@ -118,34 +120,23 @@ jobs:
 #       DockerNamespace: 'thisacr'
 #       DockerRepository: 'dicecontainer'
 #       DockerImageTag: '$(imageTag)'
-      
+
+
   # - task: AzureContainerApps@1
   #   inputs:
   #     appSourcePath: '$(Build.SourcesDirectory)/'
-  #     azureSubscription: '$(azureSubscription)'
-  #     acrName: 'thisacr'
-  #     ingress: external
-  #     targetPort: 50505
+  #     azureSubscription: '$(azureSubscription)' # Required
+  #     acrName: '$(acrName)' # Placeholder or actual name
+  #     acrUsername: '$(acrName)' # Optional placeholder
+  #     acrPassword: '$(acrPassword)' # Optional placeholder
+  #     dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile' # Optional placeholder
+  #     # containerAppEnvironment: 'idkisthistheplaceholderithink' # Optional placeholder
+  #     imageToDeploy: '$(imageName):$(imageTag)' # Placeholder or actual image name
+  #     containerAppName: '$(webAppName)' # Placeholder or actual name
+  #     resourceGroup: '$(resourceGroupName)' # Placeholder or actual group name
   #     runtimeStack: "PYTHON|3.9"
-  #     containerAppName: 'dicesaralapply'
-  #     imageToDeploy: 
-  #     resourceGroup: '$(resourceGroupName)'
-
-  - task: AzureContainerApps@1
-    inputs:
-      appSourcePath: '$(Build.SourcesDirectory)/'
-      azureSubscription: '$(azureSubscription)' # Required
-      acrName: '$(acrName)' # Placeholder or actual name
-      acrUsername: '$(acrName)' # Optional placeholder
-      acrPassword: '$(acrPassword)' # Optional placeholder
-      dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile' # Optional placeholder
-      # containerAppEnvironment: 'idkisthistheplaceholderithink' # Optional placeholder
-      imageToDeploy: '$(imageName):$(imageTag)' # Placeholder or actual image name
-      containerAppName: '$(webAppName)' # Placeholder or actual name
-      resourceGroup: '$(resourceGroupName)' # Placeholder or actual group name
-      runtimeStack: "PYTHON|3.9"
-      targetPort: 50505
-      ingress: external
+  #     targetPort: 50505
+  #     ingress: external
     
 
   #     az containerapp up \
