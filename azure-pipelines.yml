@@ -139,6 +139,7 @@ jobs:
       acrUsername: '$(acrName)' # Optional placeholder
       acrPassword: '$(acrPassword)' # Optional placeholder
       dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile' # Optional placeholder
+      # containerAppEnvironment: 'idkisthistheplaceholderithink' # Optional placeholder
       imageToDeploy: '$(imageName):$(imageTag)' # Placeholder or actual image name
       containerAppName: '$(webAppName)' # Placeholder or actual name
       resourceGroup: '$(resourceGroupName)' # Placeholder or actual group name
