@@ -8,18 +8,18 @@ az appservice plan create --name thatappserviceplan --resource-group dicetestapp
 
 
 
-az webapp create --resource-group dicetestapply_group --plan thatappserviceplan --name dicesaralapply --assign-identity '[system]' --scope /subscriptions/e4cf2944-5342-4787-b990-418828e5555539bfc/resourceGroups/dicetestapply_group --role acrpull --deployment-container-image-name thisacr.azurecr.io/imagename:latest
+az webapp create --resource-group $RESOURCE_GROUP_NAME --plan $appServicePlanName --name $webAppName --assign-identity '[system]' --scope /subscriptions/$subscriptionID/resourceGroups/$RESOURCE_GROUP_NAME --role acrpull --runtime "PYTHON|3.9" --deployment-container-image-name thisacr.azurecr.io/imagename:latest
+az webapp config set --resource-group $RESOURCE_GROUP_NAME --name $webAppName --generic-configurations '{"acrUseManagedIdentityCreds": true}'
 
 
 
-az webapp config set --resource-group dicetestapply_group --name dicesaralapply --generic-configurations '{"acrUseManagedIdentityCreds": true}'
 CREDENTIAL=$(az webapp deployment list-publishing-credentials --resource-group dicetestapply_group --name dicesaralapply --query publishingPassword --output tsv)
 echo $CREDENTIAL
 
 
-SERVICE_URI='https://$dicesaralapply:'$CREDENTIAL'@dicesaralapply.scm.azurewebsites.net/api/registry/webhook'
+# SERVICE_URI='https://$dicesaralapply:'$CREDENTIAL'@dicesaralapply.scm.azurewebsites.net/api/registry/webhook'
 
-az acr webhook create --name webhookforwebapp --registry thisacr --scope msdocspythoncontainerwebapp:* --uri $SERVICE_URI --actions push
+# az acr webhook create --name webhookforwebapp --registry thisacr --scope msdocspythoncontainerwebapp:* --uri $SERVICE_URI --actions push
 
 
 
