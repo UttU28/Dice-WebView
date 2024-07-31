@@ -119,17 +119,17 @@ jobs:
 #       DockerRepository: 'dicecontainer'
 #       DockerImageTag: '$(imageTag)'
       
-  - task: AzureContainerApps@1
-    inputs:
-      appSourcePath: '$(Build.SourcesDirectory)/'
-      azureSubscription: '$(azureSubscription)'
-      acrName: 'thisacr'
-      ingress: external
-      targetPort: 50505
-      runtimeStack: "PYTHON|3.9"
-      containerAppName: 'dicesaralapply'
-      imageToDeploy: 
-      resourceGroup: '$(resourceGroupName)'
+  # - task: AzureContainerApps@1
+  #   inputs:
+  #     appSourcePath: '$(Build.SourcesDirectory)/'
+  #     azureSubscription: '$(azureSubscription)'
+  #     acrName: 'thisacr'
+  #     ingress: external
+  #     targetPort: 50505
+  #     runtimeStack: "PYTHON|3.9"
+  #     containerAppName: 'dicesaralapply'
+  #     imageToDeploy: 
+  #     resourceGroup: '$(resourceGroupName)'
 
   - task: AzureContainerApps@1
     inputs:
