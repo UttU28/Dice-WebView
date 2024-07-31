@@ -69,7 +69,7 @@ jobs:
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
-        # az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
+        az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
         az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --scope /subscriptions/$(subscriptionID)/resourceGroups/$(resourceGroupName) --role acrpull --runtime "PYTHON|3.9" --container-image-name $(imageRepository)
         # az webapp config set --resource-group $(resourceGroupName) --name $(webAppName) --generic-configurations '{"acrUseManagedIdentityCreds": true}'
 
