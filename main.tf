@@ -2,7 +2,6 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=3.0.0"
     }
   }
   backend "azurerm" {
@@ -47,14 +46,14 @@ resource "azurerm_linux_web_app" "example" {
 
 }
 
-# resource "null_resource" "restart_web_app" {
-#   depends_on = [azurerm_linux_web_app.example]
+resource "null_resource" "restart_web_app" {
+  depends_on = [azurerm_linux_web_app.example]
 
-#   provisioner "local-exec" {
-#     command = <<EOT
-#     az webapp restart --resource-group ${data.azurerm_resource_group.example.name} --name ${azurerm_linux_web_app.example.name}
-#     EOT
-#   }
-# }
+  provisioner "local-exec" {
+    command = <<EOT
+    az webapp restart --resource-group ${data.azurerm_resource_group.example.name} --name ${azurerm_linux_web_app.example.name}
+    EOT
+  }
+}
 
 
