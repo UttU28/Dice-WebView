@@ -75,8 +75,8 @@ jobs:
 
 - job: DeployToACR
   displayName: 'Deploy to Azure Container Registry'
-  dependsOn: Build
-  # dependsOn: CreateAppServicePlan
+  # dependsOn: Build
+  dependsOn: CreateAppServicePlan
   pool:
     vmImage: 'ubuntu-latest'
   steps:
