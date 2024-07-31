@@ -108,35 +108,36 @@ jobs:
     - task: JasonBJohnson.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@1
       displayName: Install Terraform
 
-    # - task: AzureCLI@2
-    #   displayName: "Terraform INIT"
+    - task: AzureCLI@2
+      displayName: "Terraform INIT"
+      inputs:
+        azureSubscription: dicePipeline
+        scriptType: bash
+        addSpnToEnvironment: true
+        scriptLocation: inlineScript
+        inlineScript: |
+          export ARM_CLIENT_ID=6ae75f68-d956-4829-a902-1e86d1998201
+          export ARM_CLIENT_SECRET=vei8Q~tStpzTRKzDr2sPpAFUciprZJjWtvmvha_I
+          export ARM_TENANT_ID=8e2dc2c8-cb38-4b25-91cf-cca92778bd6a
+          export ARM_SUBSCRIPTION_ID=e4cf2944-5342-4787-b990-418828e39bfc
+    
+          terraform init
+          terraform plan
+    
+    # - task: TerraformCLI@1
+    #   displayName: Terraform INIT
     #   inputs:
+    #     command: init
     #     azureSubscription: dicePipeline
-    #     scriptType: bash
-    #     addSpnToEnvironment: true
-    #     scriptLocation: inlineScript
-    #     inlineScript: |
-    #       export ARM_CLIENT_ID=6ae75f68-d956-4829-a902-1e86d1998201
-    #       export ARM_CLIENT_SECRET=vei8Q~tStpzTRKzDr2sPpAFUciprZJjWtvmvha_I
-    #       export ARM_TENANT_ID=8e2dc2c8-cb38-4b25-91cf-cca92778bd6a
-    #       export ARM_SUBSCRIPTION_ID=e4cf2944-5342-4787-b990-418828e39bfc
+    #     environmentServiceName: dicePipeline
+    #     runAzLogin: true
+    #     allowTelemetryCollection: true
     
-    #       terraform init
-    
-    - task: TerraformCLI@1
-      displayName: Terraform INIT
-      inputs:
-        command: init
-        azureSubscription: dicePipeline
-        environmentServiceName: dicePipeline
-        runAzLogin: true
-        allowTelemetryCollection: true
-    
-    - task: TerraformCLI@1
-      displayName: Terraform PLAN
-      inputs:
-        command: plan
-        azureSubscription: dicePipeline
-        environmentServiceName: dicePipeline
-        runAzLogin: true
-        allowTelemetryCollection: true
+    # - task: TerraformCLI@1
+    #   displayName: Terraform PLAN
+    #   inputs:
+    #     command: plan
+    #     azureSubscription: dicePipeline
+    #     environmentServiceName: dicePipeline
+    #     runAzLogin: true
+    #     allowTelemetryCollection: true
