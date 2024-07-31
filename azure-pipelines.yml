@@ -6,7 +6,7 @@ variables:
   azureSubscription: 'dicePipeline'
   resourceGroupName: 'thisresourcegroup'
   acrName: 'thisacr'
-  webAppName: 'dicesaralapply'
+  webAppName: 'dicesaralapply1232'
   appServicePlanName: 'thisappserviceplan'
   imageName: 'imagename'
   imageTag: 'latest'
@@ -70,7 +70,7 @@ jobs:
       scriptLocation: 'inlineScript'
       inlineScript: |
         # az appservice plan create --name $(appServicePlanName) --resource-group $(resourceGroupName) --sku B1 --is-linux
-        az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --scope /subscriptions/$(subscriptionID)/resourceGroups/$(resourceGroupName) --role acrpull --runtime "PYTHON|3.9" --container-image-name $(imageRepository)
+        # az webapp create --resource-group $(resourceGroupName) --plan $(appServicePlanName) --name $(webAppName) --assign-identity '[system]' --scope /subscriptions/$(subscriptionID)/resourceGroups/$(resourceGroupName) --role acrpull --runtime "PYTHON|3.9" --container-image-name $(imageRepository)
         az webapp config set --resource-group $(resourceGroupName) --name $(webAppName) --generic-configurations '{"acrUseManagedIdentityCreds": true}'
 
         # az webapp config container set --name $(webAppName) --resource-group $(resourceGroupName) --container-image-name $(imageRepository)
