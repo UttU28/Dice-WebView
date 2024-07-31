@@ -8,34 +8,80 @@ data "azurerm_key_vault" "thiskeyvault" {
   resource_group_name = "thisresourcegroup"
 }
 
-# List of secrets to fetch
-locals {
-  secret_names = [
-    "backend-rg",
-    "backend-storage",
-    "backend-container",
-    "backend-webapp",
-    "general-location",
-    "backend-datascraping",
-    "webapp-rg",
-    "webapp-service-plan",
-    "webapp-name",
-    "webapp-image",
-    "acrName",
-    "acrPassword"
-  ]
-}
-
-# Fetch all secrets using a loop
-data "azurerm_key_vault_secret" "all_secrets" {
-  for_each    = toset(local.secret_names)
-  name        = each.key
+# Fetch secrets from the Key Vault
+data "azurerm_key_vault_secret" "backend-rg" {
+  name         = "backend-rg"
   key_vault_id = data.azurerm_key_vault.thiskeyvault.id
 }
 
-# Set local values for all secrets
-locals {
-  secret_values = { for s in local.secret_names : s => data.azurerm_key_vault_secret.all_secrets[s].value }
+data "azurerm_key_vault_secret" "backend-storage" {
+  name         = "backend-storage"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
 }
 
-# You can now access each secret value with local.secret_values["<secret_name>"]
+data "azurerm_key_vault_secret" "webapp-service-plan" {
+  name         = "webapp-service-plan"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "backend-container" {
+  name         = "backend-container"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "backend-webapp" {
+  name         = "backend-webapp"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "general-location" {
+  name         = "general-location"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "backend-datascraping" {
+  name         = "backend-datascraping"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "webapp-rg" {
+  name         = "webapp-rg"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "webapp-name" {
+  name         = "webapp-name"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "webapp-image" {
+  name         = "webapp-image"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "acrName" {
+  name         = "acrName"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "acrPassword" {
+  name         = "acrPassword"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+# Define local variables to store the secret values
+locals {
+  backend-rg           = data.azurerm_key_vault_secret.backend-rg.value
+  backend-storage      = data.azurerm_key_vault_secret.backend-storage.value
+  webapp-service-plan  = data.azurerm_key_vault_secret.webapp-service-plan.value
+  backend-container    = data.azurerm_key_vault_secret.backend-container.value
+  backend-webapp       = data.azurerm_key_vault_secret.backend-webapp.value
+  general-location     = data.azurerm_key_vault_secret.general-location.value
+  backend-datascraping = data.azurerm_key_vault_secret.backend-datascraping.value
+  webapp-rg            = data.azurerm_key_vault_secret.webapp-rg.value
+  webapp-name          = data.azurerm_key_vault_secret.webapp-name.value
+  webapp-image         = data.azurerm_key_vault_secret.webapp-image.value
+  acrName              = data.azurerm_key_vault_secret.acrName.value
+  acrPassword          = data.azurerm_key_vault_secret.acrPassword.value
+}
+

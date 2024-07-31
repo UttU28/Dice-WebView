@@ -4,33 +4,37 @@ terraform {
       source  = "hashicorp/azurerm"
     }
   }
-  backend "azurerm" {
-    resource_group_name  = local.secret_values["backend-rg"]
-    storage_account_name = local.secret_values["backend-storage"]
-    container_name       = local.secret_values["backend-container"]
-    key                  = local.secret_values["backend-webapp"]
+    backend "azurerm" {
+    resource_group_name  = "thisstoragerg"
+    storage_account_name = "dicestorage02"
+    container_name       = "13form"
+    key                  = "tfstatedice"
   }
 }
+#   backend "azurerm" {
+#     resource_group_name  = local.backend-rg
+#     storage_account_name = local.backend-storage
+#     container_name       = local.backend-container
+#     key                  = local.backend-webapp
+#   }
+# }
 
-provider "azurerm" {
-  features {}
-}
 
 resource "azurerm_resource_group" "example" {
   name = "thisresourcegroup"
-  location = local.secret_values["general-location"]
+  location = local.general-location
 }
 
 resource "azurerm_service_plan" "example" {
-  name                = local.secret_values["webapp-service-plan"]
+  name                = local.webapp-service-plan
   resource_group_name = data.azurerm_resource_group.example.name
-  location            = local.secret_values["general-location"]
+  location            = local.general-location
   os_type             = "Linux"
   sku_name            = "B1"
 }
 
 resource "azurerm_linux_web_app" "example" {
-  name                = local.secret_values["webapp-name"]
+  name                = local.webapp-name
   resource_group_name = data.azurerm_resource_group.example.name
   location            = azurerm_service_plan.example.location
   service_plan_id     = azurerm_service_plan.example.id
@@ -39,8 +43,8 @@ resource "azurerm_linux_web_app" "example" {
     always_on = true
     application_stack {
       docker_image_name        = "thisacr.azurecr.io/dicewebview:latest"
-      docker_registry_username = local.secret_values["acrName"]
-      docker_registry_password = local.secret_values["acrPassword"]
+      docker_registry_username = local.acrName
+      docker_registry_password = local.acrPassword
     }
   }
 
