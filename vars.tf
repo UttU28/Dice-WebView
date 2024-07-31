@@ -17,5 +17,5 @@ data "azurerm_key_vault_secret" "example_secret" {
 # Output the secret value
 output "example_secret_value" {
   value = data.azurerm_key_vault_secret.example_secret.value
-  sensitive = false
+  sensitive = true
 }
