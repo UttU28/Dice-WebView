@@ -83,5 +83,6 @@ locals {
   webapp-image         = data.azurerm_key_vault_secret.webapp-image.value
   acrName              = data.azurerm_key_vault_secret.acrName.value
   acrPassword          = data.azurerm_key_vault_secret.acrPassword.value
+  acrUrl = "${local.acrName}.azurecr.io/${local.webapp-image}:latest"
 }
 
