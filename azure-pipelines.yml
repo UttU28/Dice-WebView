@@ -15,63 +15,63 @@ variables:
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
 
 jobs:
-- job: Build
-  displayName: 'Build Container Image'
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - task: Docker@2
-    displayName: Build and push an image to container registry
-    inputs:
-      containerRegistry: '$(containerRegistry)'
-      repository: '$(imageName)'
-      command: build
-      Dockerfile: '$(dockerfilePath)'
-      tags: '$(imageTag)art'
-  - task: Bash@3
-    displayName: Save Docker Image
-    inputs:
-      targetType: 'inline'
-      script: |
-        docker save $(imageRepository):$(imageTag)art -o $(Pipeline.Workspace)/$(imageName).tar
-  - task: PublishPipelineArtifact@1
-    displayName: Publish the Artifact
-    inputs:
-      targetPath: '$(Pipeline.Workspace)/$(imageName).tar'
-      artifact: '$(artifactName)'
-      publishLocation: 'pipeline'
+# - job: Build
+#   displayName: 'Build Container Image'
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
+#   - task: Docker@2
+#     displayName: Build and push an image to container registry
+#     inputs:
+#       containerRegistry: '$(containerRegistry)'
+#       repository: '$(imageName)'
+#       command: build
+#       Dockerfile: '$(dockerfilePath)'
+#       tags: '$(imageTag)art'
+#   - task: Bash@3
+#     displayName: Save Docker Image
+#     inputs:
+#       targetType: 'inline'
+#       script: |
+#         docker save $(imageRepository):$(imageTag)art -o $(Pipeline.Workspace)/$(imageName).tar
+#   - task: PublishPipelineArtifact@1
+#     displayName: Publish the Artifact
+#     inputs:
+#       targetPath: '$(Pipeline.Workspace)/$(imageName).tar'
+#       artifact: '$(artifactName)'
+#       publishLocation: 'pipeline'
   
-- job: DeployToACR
-  displayName: 'Deploy to Azure Container Registry'
-  dependsOn: Build
-  # dependsOn: CreateAppServicePlan
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        buildType: 'current'
-        artifact: '$(artifactName)'
-        targetPath: '$(Pipeline.Workspace)'
-    - task: Bash@3
-      displayName: Load Docker Image
-      inputs:
-        targetType: 'inline'
-        script: |      
-          docker load --input $(Pipeline.Workspace)/$(imageName).tar
-          docker tag $(imageRepository):$(imageTag)art $(imageRepository):$(imageTag)
-    - task: Docker@2
-      displayName: Push an image to container registry
-      inputs:
-        containerRegistry: '$(containerRegistry)'
-        repository: '$(imageName)'
-        command: push
-        Dockerfile: '$(dockerfilePath)'
-        tags: '$(imageTag)'
+# - job: DeployToACR
+#   displayName: 'Deploy to Azure Container Registry'
+#   dependsOn: Build
+#   # dependsOn: CreateAppServicePlan
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
+#     - task: DownloadPipelineArtifact@2
+#       inputs:
+#         buildType: 'current'
+#         artifact: '$(artifactName)'
+#         targetPath: '$(Pipeline.Workspace)'
+#     - task: Bash@3
+#       displayName: Load Docker Image
+#       inputs:
+#         targetType: 'inline'
+#         script: |      
+#           docker load --input $(Pipeline.Workspace)/$(imageName).tar
+#           docker tag $(imageRepository):$(imageTag)art $(imageRepository):$(imageTag)
+#     - task: Docker@2
+#       displayName: Push an image to container registry
+#       inputs:
+#         containerRegistry: '$(containerRegistry)'
+#         repository: '$(imageName)'
+#         command: push
+#         Dockerfile: '$(dockerfilePath)'
+#         tags: '$(imageTag)'
 
 - job: TerraformTask
   displayName: 'Deploy Terraform Infra'
-  dependsOn: DeployToACR
+  # dependsOn: DeployToACR
   # dependsOn: CreateAppServicePlan
   pool:
     vmImage: 'ubuntu-latest'
@@ -93,7 +93,7 @@ jobs:
           export ARM_SUBSCRIPTION_ID=e4cf2944-5342-4787-b990-418828e39bfc
     
           terraform init
-          # terraform plan
+          terraform destroy
  
     # - task: TerraformCLI@1
     #   displayName: Terraform PLAN
@@ -105,11 +105,11 @@ jobs:
     #     allowTelemetryCollection: true
 
  
-    - task: TerraformCLI@1
-      displayName: Terraform APPLY
-      inputs:
-        command: apply
-        azureSubscription: dicePipeline
-        environmentServiceName: dicePipeline
-        runAzLogin: true
-        allowTelemetryCollection: true
+    # - task: TerraformCLI@1
+    #   displayName: Terraform APPLY
+    #   inputs:
+    #     command: apply
+    #     azureSubscription: dicePipeline
+    #     environmentServiceName: dicePipeline
+    #     runAzLogin: true
+    #     allowTelemetryCollection: true
