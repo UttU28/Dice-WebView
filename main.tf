@@ -1,3 +1,24 @@
+variable "terraform-state-rg" {
+  type        = string
+  description = "RG Name."
+}
+
+variable "terraform-state-account" {
+  type        = string
+  description = "Acoount Name."
+}
+
+variable "terraform-state-container" {
+  type        = string
+  description = "Container Name."
+}
+
+variable "terraform-state-webapp" {
+  type        = string
+  description = "Fiel Name."
+}
+
+
 terraform {
   required_providers {
     azurerm = {
@@ -5,10 +26,10 @@ terraform {
     }
   }
     backend "azurerm" {
-    resource_group_name  = "thisstoragerg"
-    storage_account_name = "dicestorage02"
-    container_name       = "13form"
-    key                  = "tfstatedice"
+    resource_group_name  = var.terraform-state-rg
+    storage_account_name = var.terraform-state-account
+    container_name       = var.terraform-state-container
+    key                  = var.terraform-state-webapp
   }
 }
 #   backend "azurerm" {
