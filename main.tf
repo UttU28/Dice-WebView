@@ -1,3 +1,17 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+    }
+  }
+    backend "azurerm" {
+    resource_group_name  = var.terraform-state-rg
+    storage_account_name = var.terraform-state-account
+    container_name       = var.terraform-state-container
+    key                  = var.terraform-state-webapp
+  }
+}
+
 variable "terraform-state-rg" {
   type        = string
   description = "RG Name."
@@ -18,20 +32,6 @@ variable "terraform-state-webapp" {
   description = "Fiel Name."
 }
 
-
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-    }
-  }
-    backend "azurerm" {
-    resource_group_name  = var.terraform-state-rg
-    storage_account_name = var.terraform-state-account
-    container_name       = var.terraform-state-container
-    key                  = var.terraform-state-webapp
-  }
-}
 #   backend "azurerm" {
 #     resource_group_name  = local.backend-rg
 #     storage_account_name = local.backend-storage
