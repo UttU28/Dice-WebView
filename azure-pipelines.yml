@@ -93,7 +93,7 @@ jobs:
           export ARM_SUBSCRIPTION_ID=e4cf2944-5342-4787-b990-418828e39bfc
     
           terraform init
-          terraform destroy
+          terraform destroy -auto-approve
  
     # - task: TerraformCLI@1
     #   displayName: Terraform PLAN
