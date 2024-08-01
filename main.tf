@@ -8,7 +8,7 @@ terraform {
     resource_group_name  = "thisstoragerg"
     storage_account_name = "dicestorage02"
     container_name       = "13form"
-    key                  = "tfstatedice"
+    key                  = "webappState"
   }
 }
 
