@@ -15,8 +15,20 @@ variables:
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
 
 jobs:
+- job: GetSecrets
+  displayName: 'Get Secrets from Key Vault'
+  steps:
+  - task: AzureKeyVault@2
+    displayName: 'Get Secrets from Key Vault'
+    inputs:
+      azureSubscription: '$(azureSubscription)'
+      KeyVaultName: 'thisdicekeyvault'
+      SecretsFilter: '*'
+      RunAsPreJob: true
+
 - job: Build
   displayName: 'Build Container Image'
+  dependsOn: GetSecrets
   pool:
     vmImage: 'ubuntu-latest'
   steps:
