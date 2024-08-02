@@ -36,3 +36,5 @@ allResume/
 deploy.sh
 
 *.sql
+test.py
+resume.py

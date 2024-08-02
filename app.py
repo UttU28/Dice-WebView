@@ -1,16 +1,23 @@
 import pypyodbc as odbc
 from flask import Flask, render_template, request, redirect, url_for
-from credential import *
 from datetime import datetime, timezone
 import re
+import logging
+import sys
 
 app = Flask(__name__)
-server = 'dice-sql.database.windows.net'
-database = 'dice_sql_database'
+
+# Logging configuration
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+databaseServer = 'dice-sql.database.windows.net'
+databaseName = 'dice_sql_database'
+databaseUsername = 'iAmRoot'
+databasePassword = 'Qwerty@213'
 
 # REPLACE THIS BIJSBKJFNKJBSNK JFBN:SKJFNI A: HFUNLIAUKGDKAGYDKHYAGVKHGAVKGHAKHGV
 # connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{server},1433;Database={database};Uid={username};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=5;'
-connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{server},1433;Database={database};Uid={username};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
+connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{databaseServer},1433;Database={databaseName};Uid={databaseUsername};Pwd={databasePassword};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
 
 global jobQueue
 jobQueue = []
@@ -42,7 +49,7 @@ def fetch_initial_data():
         cursor.close()
         conn.close()
     except odbc.Error as e:
-        print(f"Error fetching initial data: {e}")
+        logging.error(f"Error fetching initial data: {e}")
 
 
 def removeFromQueue(jobID):
@@ -54,9 +61,9 @@ def removeFromQueue(jobID):
         conn.commit()
         cursor.close()
         conn.close()
-        print("Removed from the Queue")
+        logging.info("Removed from the Queue")
     except odbc.Error as e:
-        print(f"Error removing from queue: {e}")
+        logging.error(f"Error removing from queue: {e}")
 
 def addToApplyQueue(jobID, selectedResume):
     try:
@@ -75,12 +82,12 @@ def addToApplyQueue(jobID, selectedResume):
         query = "DELETE FROM myQueue WHERE id = ?"
         cursor.execute(query, [jobID])
         conn.commit()
-        if cursor.rowcount != 1: print(f"JobID {jobID} already exists in apply queue. No duplicate added.")
-        else: print("Added to Apply Queue")
+        if cursor.rowcount != 1: logging.info(f"JobID {jobID} already exists in apply queue. No duplicate added.")
+        else: logging.info("Added to Apply Queue")
         cursor.close()
         conn.close()
     except odbc.Error as e:
-        print(f"Error adding to apply queue: {e}")
+        logging.error(f"Error adding to apply queue: {e}")
 
 def updateHTMLContent(thisDescription):
     keyWords = ['Snowflake', 'MongoDB', 'Azure VM', 'Logging', 'APIs', 'Kubernetes', 'Data Lakes', 'Postman', 'Extract', 'GCP Firebase', 'Apache Hadoop', 'JFrog Artifactory', 'AWS', 'Pipelines', 'Security vulnerability management', 'AngularJS', 'Azure SQL Database', 'Burp Suite', 'Bootstrap', 'Kali Linux', 'Monitoring tools', 'Apache Airflow', 'Google Cloud Platform', 'Angular', 'PyTorch', 'Scripting languages', 'AWS S3', 'Load', 'DataBricks', 'Linux shell scripting', 'Continuous Integration/Continuous Delivery', 'Groovy scripts', 'New Relic', 'Node.js', 'Azure Blob Storage', 'Docker containers', 'OWASP ZAP', 'Lean principles', 'ETL', 'Hibernate', 'Continuous Delivery', 'Continuous Improvement', 'Orchestration', 'AWS RDS', 'Java', 'Azure DevOps', 'Oracle', 'Puppet', 'Nagios', 'Grafana', 'Encryption methods', 'C#', 'Cassandra', 'Express.js', 'Data lineage', 'Apache Spark', 'JSON', 'PHP', 'GitOps', 'CI/CD', 'GitHub Actions', 'Blue-Green deployment', 'Mobile Device development', 'Data privacy', 'SQL', 'Agile', 'Python', 'Azure certifications', 'Django', 'ELK Stack', 'NGINX', 'React.js', 'Slack', 'NoSQL', 'Material UI', 'Compliance measures', 'Kibana', 'Scrum', 'GCP Cloud SQL', 'Azure Functions', 'SQL Server', 'Data governance', 'MySQL', 'Elasticsearch', 'Veracode', 'Azure Cosmos DB', 'REST APIs', 'Maven', 'Software Quality Assurance', 'Ansible', 'Microservices architecture', 'JavaScript', 'Windows PowerShell', 'Microservices', 'Vue.js', 'Nessus', 'Apache HTTP Server', 'Flask', 'RESTful APIs', 'Cloud computing', 'React', 'AWS Lambda', 'Azure services', 'ASP.NET', 'AWS services', 'TypeScript', 'Bash scripting', 'TensorFlow', 'Penetration testing', 'HTML', 'Powershell', 'Delta Lake', 'AWS EKS', 'Infrastructure as Code', 'CSS', 'Spring Boot', 'Splunk', 'GCP', 'Fortify', 'Spring Framework', 'ITIL', 'AWS CloudFormation', 'Apache Tomcat', 'NUnit', 'Azure Kubernetes Service', 'Transform', 'Docker', 'XML', 'Data Warehousing', 'Kanban', 'Data cataloging', 'AWS ECS', 'GCP Cloud Functions', 'Shift Left Security', 'Apache Kafka', 'Serverless architecture', 'Amazon Web Services', 'SOAP', 'Vulnerability management', 'Datadog', 'Bash', 'Containerization', 'Configuration management', 'GCP Compute Engine', 'JUnit', 'Continuous Integration', 'Continuous Development', 'Continuous Deployment', 'Network security', 'SonarQube', 'Canary deployment', 'GraphQL', '.NET Framework', 'PostgreSQL', 'OAuth', 'RESTful web services', 'DevSecOps', 'DevOps', 'Penetration Testing', 'Terraform', 'Git', 'Unix shell scripting', 'JIRA', 'Ruby on Rails', 'BigQuery', 'TestNG', 'Data warehousing', 'Power BI', 'GitHub', 'NoSQL databases', 'Metasploit', 'Prometheus', '.NET Core', 'Agile development', 'AWS DynamoDB', 'Identity and access management', 'Secure data communication', 'Bitbucket', 'Data analytics', 'AWS EC2', 'Chef', 'Next.js', 'GCP Cloud Storage', 'Azure security', 'GCP Kubernetes Engine', 'Six Sigma', 'Entity Framework', 'Cucumber', 'Jenkins', 'Confluence', 'Logstash', 'Appium', 'SDLC', 'JWT', 'Observability', 'YAML', 'Serverless architectures', 'Selenium', 'Redis', 'GitLab', 'Metadata management', 'Business intelligence']
@@ -104,15 +111,15 @@ def home():
         action = request.form.get("action")
         
         try:
+            logging.info(jobID, action)
             if action == "apply":
                 resumeID = request.form.get("resume_id")
-                # print(jobID, resumeID)
                 addToApplyQueue(jobID, resumeID)
             else: removeFromQueue(jobID)
 
             jobQueue = [job for job in jobQueue if job['id'] != jobID]
         except Exception as e:
-            print(f"Error processing form: {e}")
+            logging.error(f"Error processing form: {e}")
 
     if not jobQueue: fetch_initial_data()
     if not jobQueue: return render_template("jobNotFound.html")
@@ -121,9 +128,9 @@ def home():
     tempDesc = thisQueue["description"]
     tempDesc = updateHTMLContent(tempDesc)
     thisQueue["description"] = tempDesc
-    # print(resumeData)
-    # print(tempDesc)
-    # print(thisQueue)
+    # logging.info(resumeData)
+    # logging.info(tempDesc)
+    # logging.info(thisQueue)
     return render_template("index.html", jobData=thisQueue, resumeData=resumeData, pendingJobs=len(jobQueue))
 
 if __name__ == "__main__":

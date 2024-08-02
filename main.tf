@@ -1,10 +1,10 @@
 terraform {
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"
+      source = "hashicorp/azurerm"
     }
   }
-    backend "azurerm" {
+  backend "azurerm" {
     resource_group_name  = "thisstoragerg"
     storage_account_name = "dicestorage02"
     container_name       = "13form"
@@ -13,7 +13,7 @@ terraform {
 }
 
 resource "azurerm_resource_group" "example" {
-  name = local.webapp-rg
+  name     = local.webapp-rg
   location = local.general-location
 }
 
