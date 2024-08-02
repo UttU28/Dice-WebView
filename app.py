@@ -61,7 +61,7 @@ def removeFromQueue(jobID):
         conn.commit()
         cursor.close()
         conn.close()
-        logging.info("Removed from the Queue")
+        logging.info("---------------------------------------Removed from the Queue")
     except odbc.Error as e:
         logging.error(f"Error removing from queue: {e}")
 
@@ -83,7 +83,7 @@ def addToApplyQueue(jobID, selectedResume):
         cursor.execute(query, [jobID])
         conn.commit()
         if cursor.rowcount != 1: logging.info(f"JobID {jobID} already exists in apply queue. No duplicate added.")
-        else: logging.info("Added to Apply Queue")
+        else: logging.info("---------------------------------------Added to Apply Queue & Removed")
         cursor.close()
         conn.close()
     except odbc.Error as e:
@@ -111,7 +111,7 @@ def home():
         action = request.form.get("action")
         
         try:
-            logging.info(jobID, action)
+            logging.info(f'--------------------------------------- {action}')
             if action == "apply":
                 resumeID = request.form.get("resume_id")
                 addToApplyQueue(jobID, resumeID)

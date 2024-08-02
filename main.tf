@@ -39,7 +39,23 @@ resource "azurerm_linux_web_app" "example" {
       docker_registry_password = local.acrPassword
     }
   }
+  app_settings = {
+    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "true" # Ensures file system storage is enabled
+    "SCM_LOGSTREAM_ENABLED"               = "true" # Enables Logstream access
+  }
 
+  logs {
+    http_logs {
+      file_system {
+        retention_in_days = 30
+        retention_in_mb   = 100
+      }
+    }
+
+    application_logs {
+      file_system_level = "Information"
+    }
+  }
 }
 
 resource "null_resource" "restart_web_app" {
