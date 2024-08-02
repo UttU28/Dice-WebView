@@ -71,7 +71,7 @@ jobs:
 
 - job: TerraformTask
   displayName: 'Deploy Terraform Infra'
-  # dependsOn: DeployToACR
+  dependsOn: DeployToACR
   # dependsOn: CreateAppServicePlan
   pool:
     vmImage: 'ubuntu-latest'
