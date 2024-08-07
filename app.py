@@ -31,10 +31,9 @@ def fetch_initial_data():
 
         # Fetch job queue
         query = """
-            SELECT TOP 20 allData.id, allData.title, allData.description, allData.company, myQueue.timeOfArrival 
-            FROM myQueue 
-            JOIN allData ON myQueue.id = allData.id 
-            ORDER BY myQueue.timeOfArrival DESC
+            SELECT TOP 20 id, title, description, company, dateUpdated 
+            FROM allData  
+            ORDER BY dateUpdated DESC
         """
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -56,7 +55,7 @@ def removeFromQueue(jobID):
     try:
         conn = odbc.connect(connectionString)
         cursor = conn.cursor()
-        query = "DELETE FROM myQueue WHERE id = ?"
+        query = "DELETE FROM allData WHERE id = ?"
         cursor.execute(query, [jobID])
         conn.commit()
         cursor.close()
@@ -79,11 +78,11 @@ def addToApplyQueue(jobID, selectedResume):
         """
         params = (jobID, timestamp, selectedResume, jobID)
         cursor.execute(query, params)
-        query = "DELETE FROM myQueue WHERE id = ?"
-        cursor.execute(query, [jobID])
-        conn.commit()
         if cursor.rowcount != 1: logging.info(f"JobID {jobID} already exists in apply queue. No duplicate added.")
         else: logging.info("---------------------------------------Added to Apply Queue & Removed")
+        query = "DELETE FROM allData WHERE id = ?"
+        cursor.execute(query, [jobID])
+        conn.commit()
         cursor.close()
         conn.close()
     except odbc.Error as e:

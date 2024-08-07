@@ -1,12 +1,14 @@
 import os
 import pypyodbc as odbc
-from credential import *
 
-server = 'dice-sql.database.windows.net'
-database = 'dice_sql_database'
+databaseServer = 'dice-sql.database.windows.net'
+databaseName = 'dice_sql_database'
+databaseUsername = 'iAmRoot'
+databasePassword = 'Qwerty@213'
 
-connectionString = f'Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:{server},1433;Database={database};Uid={username};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
-
+# REPLACE THIS BIJSBKJFNKJBSNK JFBN:SKJFNI A: HFUNLIAUKGDKAGYDKHYAGVKHGAVKGHAKHGV
+# connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{server},1433;Database={database};Uid={username};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=5;'
+connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{databaseServer},1433;Database={databaseName};Uid={databaseUsername};Pwd={databasePassword};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
 
 def addResumeToDatabase(directory):
     conn = odbc.connect(connectionString)
