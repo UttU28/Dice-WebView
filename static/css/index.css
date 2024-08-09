@@ -71,21 +71,21 @@ button {
     display: flex;
 }
 /* Deny button */
-#nope {
+#rejectBtn {
     width: 50%;
     background-color: red; /* Red background */
     color: white; /* White text */
 }
 
 /* Show Resume button */
-#love {
+#resumeBtn {
     width: 50%;
     background-color: white; /* White background */
     color: red; /* Red text */
 }
 
 /* Apply button */
-button[name="action"][value="apply"] {
+#acceptBtn {
     width: 100%;
     background-color: green; /* Green background */
     color: white; /* White text */

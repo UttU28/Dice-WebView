@@ -10,6 +10,13 @@
 </head>
 
 <body>
+
+    <div class="navBar">
+        <h3>Welcome, {{ user }}!</h1>
+        <a href="{{ url_for('manageResume') }}">Manage Resumes</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
     <div class="tinder">
         <div class="card tinder--card" id="jobCard">
             <div class="card-header">
@@ -31,7 +38,7 @@
                 <div class="resume-options">
                     {% for resume_id, resume_name in resumeData.items() %}
                     <label class="resume-option">
-                        <input type="radio" name="resume_id" id="resume_{{ resume_id }}" value="{{ resume_id }}">
+                        <input type="radio" name="resume_id" id="resume_{{ resume_id }}" value="{{ resume_name }}">
                         <span>{{ resume_name }}</span>
                     </label>
                     {% endfor %}
@@ -41,7 +48,7 @@
         </div>
         <div class="tinder--buttons">
             <button id="rejectBtn">Deny</button>
-            <button id="love" type="button" onclick="toggleSelectResume()">Show Resume</button>
+            <button id="resumeBtn" type="button" onclick="toggleSelectResume()">Show Resume</button>
         </div>
     </div>
 
@@ -81,13 +88,14 @@
                     $('#jobCard').data('job-id', job[index].id);
                 } else {
                     // No more jobs
-                    $.ajax({
-                        url: "{{ url_for('noMoreJobs') }}",
-                        method: "GET",
-                        success: function (response) {
-                            $('body').html(response);
-                        }
-                    });
+                    window.location.href = "{{ url_for('index') }}";
+                    // $.ajax({
+                    //     url: "{{ url_for('noMoreJobs') }}",
+                    //     method: "GET",
+                    //     success: function (response) {
+                    //         $('body').html(response);
+                    //     }
+                    // });
                 }
             }
 
@@ -107,6 +115,7 @@
                         alert('Error accepting job');
                     }
                 });
+                toggleSelectResume();
             });
 
             $('#rejectBtn').click(function () {

@@ -5,10 +5,12 @@ import pyodbc
 from config import AzureSQLConfig
 from datetime import datetime, timezone
 
+# Connection Management
 def getDbConnection():
     connection = pyodbc.connect(AzureSQLConfig.connectionString)
     return connection
 
+# User Management
 def createUser(name, email, hashedPassword):
     connection = getDbConnection()
     cursor = connection.cursor()
@@ -23,28 +25,6 @@ def createUser(name, email, hashedPassword):
     finally:
         cursor.close()
         connection.close()
-
-def loadJobsTill(lastView):
-    connection = getDbConnection()
-    cursor = connection.cursor()
-    try:
-        cursor.execute(
-            """
-                SELECT TOP 20 id, title, description, company, dateUpdated
-                FROM allData
-                WHERE dateUpdated > ?
-                ORDER BY dateUpdated DESC
-            """,
-            (lastView,)
-        )
-        rows = cursor.fetchall()
-        jobQueue = [{'id': row[0], 'title': row[1], 'description': row[2], 'company': row[3], 'timeOfArrival': str(row[4])} for row in rows]
-    except pyodbc.Error as e:
-        print(f"Error: {e}")
-    finally:
-        cursor.close()
-        connection.close()
-    return jobQueue
 
 def getUserByEmail(email):
     connection = getDbConnection()
@@ -92,6 +72,29 @@ def updateLastView(email, newLastView):
         cursor.close()
         connection.close()
 
+# Job Management
+def loadJobsTill(lastView):
+    connection = getDbConnection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(
+            """
+                SELECT TOP 20 id, title, description, company, dateUpdated
+                FROM allData
+                WHERE dateUpdated > ?
+                ORDER BY dateUpdated ASC
+            """,
+            (lastView,)
+        )
+        rows = cursor.fetchall()
+        jobQueue = [{'id': row[0], 'title': row[1], 'description': row[2], 'company': row[3], 'timeOfArrival': str(row[4])} for row in rows]
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+    return jobQueue
+
 def addToApplyQueue(jobID, selectedResume, email):
     connection = getDbConnection()
     cursor = connection.cursor()
@@ -112,7 +115,37 @@ def addToApplyQueue(jobID, selectedResume, email):
         else:
             print(f"Added JobID {jobID} to apply queue and removed from allData")
         connection.commit()
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+    finally:
         cursor.close()
+        connection.close()
+
+# Resume Management
+def addResumeToDatabase(resumeName, email):
+    connection = getDbConnection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO resumeList (resumeName, email) VALUES (?, ?)",
+            (resumeName, email)
+        )
+        connection.commit()
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+
+def deleteResumeFromDatabase(resumeId):
+    connection = getDbConnection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(
+            "DELETE FROM resumeList WHERE resumeId = ?",
+            (resumeId,)
+        )
+        connection.commit()
     except pyodbc.Error as e:
         print(f"Error: {e}")
     finally:
@@ -122,10 +155,13 @@ def addToApplyQueue(jobID, selectedResume, email):
 def getUsersResumes(email):
     connection = getDbConnection()
     cursor = connection.cursor()
-    resumeData = None
+    resumeData = {}
     try:
-        cursor.execute("SELECT * FROM resumeList")
-        # cursor.execute("SELECT * FROM resumeList WHERE email = ?", (email,))
+        # cursor.execute("SELECT * FROM resumeList")
+        cursor.execute(
+            "SELECT * FROM resumeList WHERE email = ?", 
+            (email,)
+        )
         rows = cursor.fetchall()
         resumeData = {row[0]: row[1] for row in rows}
     except pyodbc.Error as e:

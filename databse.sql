@@ -16,17 +16,17 @@
 -- );
 
 -- Create resumeList table
--- CREATE TABLE resumeList (
---     resumeId INT PRIMARY KEY IDENTITY(1,1),
---     resumeName VARCHAR(255) NOT NULL,
---     email VARCHAR(255) NOT NULL
--- );
+CREATE TABLE resumeList (
+    resumeId INT PRIMARY KEY IDENTITY(1,1),
+    resumeName VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
 
--- -- Create applyQueue table
+-- Create applyQueue table
 -- CREATE TABLE applyQueue (
 --     id VARCHAR(36) NOT NULL,
 --     timeOfArrival BIGINT NOT NULL,
---     selectedResume INT,
+--     selectedResume VARCHAR(255) NOT NULL,
 --     email VARCHAR(255) NOT NULL
 -- );
 
