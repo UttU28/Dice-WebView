@@ -1,0 +1,6 @@
+requests
+flask
+pypyodbc
+aioodbc==0.0.1
+gunicorn
+Werkzeug==2.2.2

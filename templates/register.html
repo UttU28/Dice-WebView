@@ -1,0 +1,54 @@
+<!-- templates/register.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Register</h2>
+
+        <!-- Error message section -->
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        <form id="registerForm" method="POST" action="{{ url_for('register') }}">
+            <input type="text" name="name" placeholder="Name" value="{{ request.form.get('name', '') }}" required>
+            <input type="email" name="email" placeholder="Email" value="{{ request.form.get('email', '') }}" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Register</button>
+        </form>
+
+        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            // Get form inputs
+            const email = event.target.email.value;
+            const password = event.target.password.value;
+            
+            // Basic email regex for validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            // Validate email format
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                event.preventDefault(); // Stop form submission
+                return;
+            }
+            
+            // Validate password length
+            if (password.length < 4) {
+                alert('Password must be at least 4 characters long.');
+                event.preventDefault(); // Stop form submission
+            }
+        });
+    </script>
+</body>
+</html>
