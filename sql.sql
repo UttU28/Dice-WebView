@@ -1,2 +1,5 @@
 -- SELECT * FROM allData;
--- SELECT * FROM users;
+SELECT * FROM applyQueue;
+
+-- DELETE FROM applyQueue;
+-- DROP TABLE applyQueue;

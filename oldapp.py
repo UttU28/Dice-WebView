@@ -33,9 +33,9 @@ def fetch_initial_data():
             WHERE dateUpdated > 940704000
             ORDER BY dateUpdated DESC
         """
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        jobQueue = [{'id': row[0], 'title': row[1], 'description': row[2], 'company': row[3], 'timeOfArrival': str(row[4])} for row in rows]
+        # cursor.execute(query)
+        # rows = cursor.fetchall()
+        # jobQueue = [{'id': row[0], 'title': row[1], 'description': row[2], 'company': row[3], 'timeOfArrival': str(row[4])} for row in rows]
 
         # Fetch resume list
         query = "SELECT * FROM resumeList"
@@ -125,9 +125,6 @@ def home():
     tempDesc = thisQueue["description"]
     tempDesc = updateHTMLContent(tempDesc)
     thisQueue["description"] = tempDesc
-    # logging.info(resumeData)
-    # logging.info(tempDesc)
-    # logging.info(thisQueue)
     return render_template("index.html", jobData=thisQueue, resumeData=resumeData, pendingJobs=len(jobQueue))
 
 if __name__ == "__main__":

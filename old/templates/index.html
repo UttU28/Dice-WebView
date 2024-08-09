@@ -13,7 +13,7 @@
 
 <body>
     <div class="tinder">
-        <form method="POST" class="card tinder--cards">
+        <div class="card tinder--cards">
             <div class="totalCount">Count: {{ pendingJobs }}</div>
             <div class="card tinder--card" id="jobCard">
                 <div class="card-header">
@@ -40,71 +40,71 @@
                         </label>
                         {% endfor %}
                     </div>
-                    <button type="submit" name="action" value="apply">Apply</button>
+                    <button id="acceptBtn">Apply</button>
                 </div>
             </div>
             <div class="tinder--buttons">
-                <button id="nope" type="submit" name="action" value="deny">Deny</button>
+                <button id="rejectBtn">Deny</button>
                 <button id="love" type="button" onclick="toggleSelectResume()">Show Resume</button>
             </div>
-        </form>
-
-        <script>
-            document.querySelectorAll('.resume-option').forEach(function (option) {
-                option.addEventListener('click', function () {
-                    var radio = option.querySelector('input[type="radio"]');
-                    radio.checked = true;
-                    updateApplyButtonStyle();
-                });
-            });
-
-            // Function to update Apply button style
-            function updateApplyButtonStyle() {
-                var applyButton = document.querySelector('.apply-button');
-                var isChecked = document.querySelector('input[name="resume_id"]:checked') !== null;
-                applyButton.classList.toggle('green', isChecked);
-            }
-
-            // Initial call to update Apply button style on page load
-            updateApplyButtonStyle();
-        </script>
-        <script>
-            function toggleSelectResume() {
-                var jobCard = document.getElementById('jobCard');
-                var selectResumeCard = document.getElementById('selectResumeCard');
-
-                jobCard.classList.toggle('hidden');
-                window.scrollTo(top);
-                selectResumeCard.classList.toggle('hidden');
-            }
-        </script>
-        <script>
-            // Function to calculate time ago
-            function timeAgo(timestamp) {
-                const current = new Date();
-                const previous = new Date(timestamp * 1000); // Convert UNIX timestamp to milliseconds
-                const diff = current - previous;
-
-                const seconds = Math.floor(diff / 1000);
-                const minutes = Math.floor(seconds / 60);
-                const hours = Math.floor(minutes / 60);
-                const days = Math.floor(hours / 24);
-
-                if (days > 0) {
-                    return days + " days ago";
-                } else if (hours > 0) {
-                    return hours + " hours ago";
-                } else if (minutes > 0) {
-                    return minutes + " minutes ago";
-                } else {
-                    return seconds + " seconds ago";
-                }
-            }
-
-            const timeOfArrival = {{ jobData.timeOfArrival }};
-            document.getElementById("timeAgo").textContent = timeAgo(timeOfArrival);
-        </script>
+        </div>
+    </div>
     <div class="end"></div>
+
+    <script>
+        function toggleSelectResume() {
+            var jobCard = document.getElementById('jobCard');
+            var selectResumeCard = document.getElementById('selectResumeCard');
+
+            jobCard.classList.toggle('hidden');
+            window.scrollTo(top);
+            selectResumeCard.classList.toggle('hidden');
+        }
+    </script>
+    <script>
+        // Function to calculate time ago
+        function timeAgo(timestamp) {
+            const current = new Date();
+            const previous = new Date(timestamp * 1000); // Convert UNIX timestamp to milliseconds
+            const diff = current - previous;
+
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (days > 0) {
+                return days + " days ago";
+            } else if (hours > 0) {
+                return hours + " hours ago";
+            } else if (minutes > 0) {
+                return minutes + " minutes ago";
+            } else {
+                return seconds + " seconds ago";
+            }
+        }
+
+        const timeOfArrival = {{ jobData.timeOfArrival }};
+        document.getElementById("timeAgo").textContent = timeAgo(timeOfArrival);
+    </script>
 </body>
 
 </html>
+
+
+
+<div class="end"></div>
+<div id="tinder">
+    {% if jobData %}
+    <div id="job">
+        <h2 id="jobTitle">{{ jobData[0].title }}</h2>
+        <p id="jobDescription">{{ jobData[0].description|safe }}</p>
+        <p><strong>Company:</strong> {{ jobData[0].company }}</p>
+        <p><strong>Time of Arrival:</strong> {{ jobData[0].timeOfArrival }}</p>
+    </div>
+    <button id="acceptBtn">Accept</button>
+    <button id="rejectBtn">Reject</button>
+    {% else %}
+    <p>No jobs available</p>
+    {% endif %}
+</div>

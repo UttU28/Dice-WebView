@@ -1,9 +1,9 @@
-CREATE TABLE users (
-    email VARCHAR(255) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    hashed_password VARCHAR(255) NOT NULL,
-    lastView BIGINT NOT NULL
-);
+-- CREATE TABLE users (
+--     email VARCHAR(255) PRIMARY KEY,
+--     name VARCHAR(255) NOT NULL,
+--     hashed_password VARCHAR(255) NOT NULL,
+--     last_view BIGINT NOT NULL
+-- );
 
 -- -- Create allData table
 -- CREATE TABLE allData (
@@ -15,20 +15,22 @@ CREATE TABLE users (
 --     dateUpdated BIGINT NOT NULL
 -- );
 
--- -- Create resumeList table
+-- Create resumeList table
 -- CREATE TABLE resumeList (
 --     resumeId INT PRIMARY KEY IDENTITY(1,1),
---     resumeName VARCHAR(255) NOT NULL
+--     resumeName VARCHAR(255) NOT NULL,
+--     email VARCHAR(255) NOT NULL
 -- );
 
 -- -- Create applyQueue table
 -- CREATE TABLE applyQueue (
---     id VARCHAR(36) PRIMARY KEY,
+--     id VARCHAR(36) NOT NULL,
 --     timeOfArrival BIGINT NOT NULL,
---     selectedResume INT
+--     selectedResume INT,
+--     email VARCHAR(255) NOT NULL
 -- );
 
--- Create scoreBoard table
+-- -- Create scoreBoard table
 -- CREATE TABLE scoreBoard (
 --     contender VARCHAR(255) NOT NULL,
 --     score INT NOT NULL,

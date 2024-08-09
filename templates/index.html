@@ -1,18 +1,142 @@
-<!-- templates/index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Job Card</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Welcome, {{ user }}!</h1>
-        <p>You are logged in.</p>
-        <a href="{{ url_for('logout') }}">Logout</a>
+    <div class="tinder">
+        <div class="card tinder--card" id="jobCard">
+            <div class="card-header">
+                <h2 id="jobTitle">{{ jobData[0].title }}</h2>
+                <p id="companyName">{{ jobData[0].company }}</p>
+                <p id="timeAgo"></p>
+            </div>
+            <div class="card-body">
+                <p id="jobDescription">{{ jobData[0].description | safe }}</p>
+            </div>
+        </div>
+        <div class="selectResume card tinder--card hidden" id="selectResumeCard">
+            <div class="card-header">
+                <input type="hidden" name="job_id" value="{{ jobData[0].id }}">
+                <h2>Select Resume</h2>
+                <p>Sambhal K Gandu..</p>
+            </div>
+            <div class="card-body">
+                <div class="resume-options">
+                    {% for resume_id, resume_name in resumeData.items() %}
+                    <label class="resume-option">
+                        <input type="radio" name="resume_id" id="resume_{{ resume_id }}" value="{{ resume_id }}">
+                        <span>{{ resume_name }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <button id="acceptBtn">Apply</button>
+            </div>
+        </div>
+        <div class="tinder--buttons">
+            <button id="rejectBtn">Deny</button>
+            <button id="love" type="button" onclick="toggleSelectResume()">Show Resume</button>
+        </div>
     </div>
+
+    <script>
+        $(document).ready(function () {
+            let currentIndex = 0;
+
+            function timeAgo(timestamp) {
+                const current = new Date();
+                const previous = new Date(timestamp * 1000); // Convert UNIX timestamp to milliseconds
+                const diff = current - previous;
+
+                const seconds = Math.floor(diff / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                const days = Math.floor(hours / 24);
+
+                if (days > 0) {
+                    return days + " days ago";
+                } else if (hours > 0) {
+                    return hours + " hours ago";
+                } else if (minutes > 0) {
+                    return minutes + " minutes ago";
+                } else {
+                    return seconds + " seconds ago";
+                }
+            }
+
+            function updateJob(index) {
+                if (index < {{ pendingJobs }}) {
+                    const job = {{ jobData | tojson }};
+                    $('#jobTitle').text(job[index].title);
+                    $('#companyName').text(job[index].company);
+                    $('#timeAgo').text(timeAgo(job[index].timeOfArrival));
+                    $('#timeAgo').data('lastView', job[index].timeOfArrival);
+                    $('#jobDescription').html(job[index].description);
+                    $('#jobCard').data('job-id', job[index].id);
+                } else {
+                    // No more jobs
+                    $.ajax({
+                        url: "{{ url_for('noMoreJobs') }}",
+                        method: "GET",
+                        success: function (response) {
+                            $('body').html(response);
+                        }
+                    });
+                }
+            }
+
+            $('#acceptBtn').click(function () {
+                const jobId = $('#jobCard').data('job-id');
+                const selectedResume = $('input[name="resume_id"]:checked').val();
+                const lastView = $('#timeAgo').data('lastView');
+                $.ajax({
+                    url: "{{ url_for('jobAccepted') }}",
+                    method: "POST",
+                    data: { jobID: jobId, lastView: lastView, selectedResume: selectedResume },
+                    success: function () {
+                        currentIndex++;
+                        updateJob(currentIndex);
+                    },
+                    error: function () {
+                        alert('Error accepting job');
+                    }
+                });
+            });
+
+            $('#rejectBtn').click(function () {
+                const lastView = $('#timeAgo').data('lastView');
+                $.ajax({
+                    url: "{{ url_for('jobRejected') }}",
+                    method: "POST",
+                    data: { lastView: lastView },
+                    success: function () {
+                        currentIndex++;
+                        updateJob(currentIndex);
+                    },
+                    error: function () {
+                        alert('Error accepting job');
+                    }
+                });
+            });
+
+            // Initial job load
+            updateJob(currentIndex);
+        });
+
+        function toggleSelectResume() {
+            var jobCard = document.getElementById('jobCard');
+            var selectResumeCard = document.getElementById('selectResumeCard');
+
+            jobCard.classList.toggle('hidden');
+            selectResumeCard.classList.toggle('hidden');
+        }
+    </script>
 </body>
+
 </html>

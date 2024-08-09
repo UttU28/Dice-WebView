@@ -1,12 +1,12 @@
 # Main application file
 # app.py
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from config import AzureSQLConfig
 from flask_bcrypt import Bcrypt
-from utils.db_utils import createUser, getUserByEmail, updatePassword, loadJobsTill
+from utils.db_utils import *
 from utils.email_utils import sendOtpEmail
-import os
+import os, re
 import random
 
 # Initialize Flask app
@@ -16,13 +16,62 @@ app.config.from_object(AzureSQLConfig)
 # Initialize bcrypt for password hashing
 bcrypt = Bcrypt(app)
 
+def update_html_content(description):
+    keyWords = ['Snowflake', 'MongoDB', 'Azure VM']
+    lowercase_keywords = sorted([kw.lower() for kw in keyWords], key=len, reverse=True)
+    pattern = re.compile(r'\b(' + '|'.join(map(re.escape, lowercase_keywords)) + r')\b', re.IGNORECASE)
+
+    def replace_keywords(match):
+        keyword = match.group(0)
+        return f"<span class='keyWord'>{keyword}</span>"
+
+    description = pattern.sub(replace_keywords, description)
+    description = description.replace('\n \n', '\n').replace('\n', '<br>')
+    return description
+
+
 # Home route
 @app.route('/')
 def index():
     if 'user' in session:
-        loadJobsTill(session['lastView'])
-        return render_template('index.html', user=session['user'])
+        jobData = loadJobsTill(session['lastView'])
+        # resumeData = getUsersResumes(session['email'])
+        resumeData = {1: 'AWS Utsav Chaudhary Resume.pdf', 2: 'Azure Utsav Chaudhary Resume.pdf', 3: 'DevOps SDE - Utsav Chaudhary.pdf', 4: 'GCP Utsav Chaudhary Resume.pdf', 5: 'GitHub Utsav Chaudhary Resume.pdf', 6: 'ML-DevOps Utsav Chaudhary Resume.pdf', 7: 'Utsav Chaudhary Resume-.pdf', 8: 'Utsav Chaudhary Resume.pdf'}
+
+        if not jobData:
+            return render_template("jobNotFound.html")
+        for i in range(len(jobData)): jobData[i]["description"] = update_html_content(jobData[i]["description"])
+
+        return render_template("index.html", jobData=jobData, resumeData=resumeData, pendingJobs=len(jobData))
+        #     return render_template('index.html', user=session['user'], jobData=jobData)
+        return render_template("jobNotFound.html")
     return redirect(url_for('login'))
+
+@app.route('/jobAccepted', methods=['POST'])
+def jobAccepted():
+    jobID = request.form.get('jobID')
+    selectedResume = request.form.get('selectedResume')
+    lastView = request.form.get('lastView')
+
+    print(jobID, selectedResume, lastView)
+    if jobID:
+        addToApplyQueue(jobID, selectedResume, session['email'])
+        updateLastView(session['email'], lastView)
+        return jsonify(success=True)
+    return jsonify(success=False), 400
+
+@app.route('/jobRejected', methods=['POST'])
+def jobRejected():
+    lastView = request.form.get('lastView')
+    if lastView:
+        updateLastView(session['email'], lastView)
+        session['lastView'] = lastView
+        return jsonify(success=True)
+    return jsonify(success=False), 400
+
+@app.route('/noMoreJobs')
+def noMoreJobs():
+    return render_template('jobNotFound.html')
 
 # Registration route
 @app.route('/register', methods=['GET', 'POST'])
@@ -55,7 +104,8 @@ def login():
         user = getUserByEmail(email)
         if user and bcrypt.check_password_hash(user['hashed_password'], password):
             session['user'] = user['name']
-            session['lastView'] = user['lastView']
+            session['email'] = user['email']
+            session['lastView'] = user['last_view']
             return redirect(url_for('index'))
         
         # If login fails, return to the login page with an error message
