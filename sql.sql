@@ -1,0 +1,2 @@
+-- SELECT * FROM allData;
+-- SELECT * FROM users;

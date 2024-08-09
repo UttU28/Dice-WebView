@@ -1,0 +1,54 @@
+<!-- templates/login.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Login</h2>
+        
+        <!-- Error message section -->
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+            <input type="email" name="email" placeholder="Email" value="{{ request.form.get('email', '') }}" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        
+        <p>Forgot your password? <a href="{{ url_for('forgotPassword') }}">Reset it here</a></p>
+        <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            // Get form inputs
+            const email = event.target.email.value;
+            const password = event.target.password.value;
+            
+            // Basic email regex for validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            // Validate email format
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                event.preventDefault(); // Stop form submission
+                return;
+            }
+            
+            // Validate password length
+            if (password.length < 4) {
+                alert('Password must be at least 4 characters long.');
+                event.preventDefault(); // Stop form submission
+            }
+        });
+    </script>
+</body>
+</html>
