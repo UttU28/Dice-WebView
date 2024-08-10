@@ -1,29 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Resumes</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1>Manage Resumes</h1>
-        <form action="{{ url_for('manageResume') }}" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".pdf,.doc,.docx">
-            <input type="submit" value="Upload New Resume">
-        </form>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Resume Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/root.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
 
-        <h2>Uploaded Resumes</h2>
-        <ul>
-            {% for resume_id, resume_name in resumes.items() %}
-                <li>
-                    {{ resume_name }}
-                    <a href="{{ url_for('delete_resume', resume_id=resume_id) }}">Delete</a>
-                </li>
-            {% endfor %}
-        </ul>
-        <a href="{{ url_for('index') }}">Back to Home</a>
+</head>
+
+<body>
+    <div class="mainName">DICE SARAL APPLY</div>
+    <a href="index.html" class="addText">Done Here?</a>
+    <div class="form-container">
+        <h2>Resume Manager</h2>
+
+        <div class="container">
+            <h1>Manage Resumes</h1>
+            <form action="{{ url_for('manageResume') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".pdf,.doc,.docx">
+                <input type="submit" value="Upload New Resume">
+            </form>
+    
+            <h2>Uploaded Resumes</h2>
+            <ul>
+                {% for resume_id, resume_name in resumes.items() %}
+                    <li>
+                        {{ resume_name }}
+                        <a href="{{ url_for('delete_resume', resume_id=resume_id) }}">Delete</a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <a href="{{ url_for('index') }}">Back to Home</a>
+        </div>
+
+        <div class="container">
+            <!-- <a href="{{ url_for('forgotPassword') }}" class="addText">Forgot your password?</a> -->
+            <!-- <a href="{{ url_for('register') }}" class="addText">Don't have an account?</a> -->
+            <a href="register.html" class="addText">Don't have an account?</a>
+        </div>
     </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            const email = event.target.email.value;
+            const password = event.target.password.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                event.preventDefault();
+                return;
+            }
+
+            if (password.length < 4) {
+                alert('Password must be at least 4 characters long.');
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
+
 </html>

@@ -8,6 +8,8 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css">
    <!--=============== CSS ===============-->
    <link rel="stylesheet" href="assets/css/styles.css">
+   <link rel="stylesheet" href="assets/css/jobCard.css">
+   <link rel="stylesheet" href="assets/css/navbar.css">
    <title>Dice Saral Apply</title>
 </head>
 
@@ -41,8 +43,8 @@
    <br>
    <br>
 
-   <div class="tinder">
-      <div class="card tinder--card" id="jobCard">
+   <div class="jobCard">
+      <div class="card jobCard--card" id="jobCard">
           <div class="card-header">
               <h2 id="jobTitle">AI-ML Engineer</h2>
               <p id="companyName">Atika Tech</p>
@@ -52,7 +54,7 @@
               <p id="jobDescription">Position: AIML Engineer <br>Locations: Charlotte NC (Primary), Concord CA (secondary) <br>Experience: 9 Years <br>Key Responsibilities: <br>Participate in developing Generative AI &amp; Traditional AI Platform Capabilities on enterprise on-prem and cloud platforms. <br>Responsible for AI model delivery to on-prem infrastructure and cloud platforms (Google Cloud Platform-Vertex AI, Azure Client) <br>Collaborating with Data scientist to optimize the scoring pipeline. <br>Building automation capabilities to deploy Client Models and LLM Models on the enterprise on-prem platform and cloud platform. <br>Build and Deploy capabilities for automating model scoring/Inferencing of Client models and LLMs. <br>Build and Deploy capabilities for data pipeline deployment standardization and model consumption by multiple LOBs. <br>Collaborate with product owners, devOps team, data scientists, support teams to define and drive end to end model scoring pipelines. <br>Participate in day-to-day standups for platform capability build. <br>Provide SME guidance for data science teams on software engineering principles, model deployments, platform capabilities. <br>Drive AI use case delivery end to end collaborating with Data scientists, Data Engineers, LOB Technology using standardized platform processes and capabilities. <br>Support Production Issues partnering with production support. <br>Key Requirements: <br>5+ years of Python experience <br>5+ years of big data experience needed (Big Query, Hadoop) <br>3 years of experience in AIML area (MLOps) <br>2+ years of experience in developing APIs using Python/FastAPI. <br>1+ year of Document AI, Agent Builder/Google Cloud Platform search/conversation / Dialogflow - Nice to have <br>Good to have 1+year of experience in LLM, Generative AI (developing capabilities or dev/ops) <br>Good to have Experience in developing of API on Google Cloud Platform/Azure/API Gateways <br>Good to have 1+year of experience in Vector Database, Model Development would be added benefit. <br></p>
           </div>
       </div>
-      <div class="selectResume card tinder--card hidden" id="selectResumeCard">
+      <div class="selectResume card jobCard--card hidden" id="selectResumeCard">
           <div class="card-header">
               <input type="hidden" name="job_id" value="506c09f8-3b51-4637-8615-d291f211953e">
               <h2>Select Resume</h2>
@@ -70,7 +72,7 @@
               <button id="acceptBtn">Apply</button>
           </div>
       </div>
-      <div class="tinder--buttons">
+      <div class="jobCard--buttons">
           <button id="rejectBtn">Deny</button>
           <button id="resumeBtn" type="button" onclick="toggleSelectResume()">Show Resume</button>
       </div>

@@ -1,8 +1,9 @@
 -- SELECT * FROM allData;
 -- UPDATE users SET last_view = 940704000 WHERE email = 'utsavmaan28@gmail.com'
+SELECT * FROM allData;
 SELECT * FROM applyQueue;
 SELECT * FROM resumeList;
--- -- SELECT * FROM users;
+SELECT * FROM users;
 
 
 -- DELETE FROM resumeList;

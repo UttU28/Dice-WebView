@@ -158,7 +158,7 @@ def forgotPassword():
 
     return render_template('forgot_password.html')
 
-@app.route('/reset-password', methods=['GET', 'POST'])
+@app.route('/resetPassword', methods=['GET', 'POST'])
 def resetPassword():
     if request.method == 'POST':
         otp = request.form['otp']
@@ -174,7 +174,7 @@ def resetPassword():
         
         flash('Invalid OTP. Please try again.', 'danger')
     
-    return render_template('reset_password.html')
+    return render_template('resetPassword.html')
 
 
 @app.route('/resumes', methods=['GET', 'POST'])

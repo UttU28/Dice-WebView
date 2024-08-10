@@ -1,0 +1,165 @@
+/* Card Styling */
+.card {
+  border-radius: 8px;
+}
+
+/* Hidden class */
+.hidden {
+  display: none;
+}
+
+/* Titled tower styling */
+.titledTower {
+  position: absolute;
+  transform: rotate(-30deg);
+  margin-top: -1rem;
+  font-size: .6rem;
+  color: var(--title-color);
+}
+
+/* Updated styles for jobCard */
+.jobCard {
+  max-height: 90vh; /* 90% of the viewport height */
+  border-radius: 8px;
+  display: flex;
+  margin-top: var(--header-height);
+  flex-direction: column;
+}
+
+/* Card Header and Body styling */
+.card-header {
+  padding: 1rem;
+}
+
+.card-body {
+  padding: 1rem;
+  overflow-y: auto; /* Allow scrolling in the body */
+  flex: 1; /* Take up remaining space */
+}
+
+/* Set a fixed height for the description area in mobile view */
+@media (max-width: 768px) {
+  .card-header {
+    height: 15vh;
+  }
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 60vh; /* Adjust this height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+}
+
+
+/* Ensure jobCard buttons are positioned at the bottom and do not move */
+.jobCard--buttons {
+  display: flex;
+  justify-content: space-around;
+  height: 3rem;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+/* Reject Button */
+#rejectBtn {
+  width: 45%;
+  border: 2px var(--apnaRed) solid; /* Red border */
+  background: none;
+  color: var(--apnaRed); /* Red text */
+  border-radius: 1rem;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+#rejectBtn:hover {
+  background: var(--apnaRed);
+  color: var(--bodyColor); /* Text color changes to body color */
+}
+
+/* Show Resume Button */
+#resumeBtn {
+  width: 45%;
+  border: 2px var(--apnaBlue) solid; /* Turquoise border */
+  background: none;
+  color: var(--apnaBlue); /* Turquoise text */
+  border-radius: 1rem;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+#resumeBtn:hover {
+  background: var(--apnaBlue);
+  color: var(--bodyColor); /* Text color changes to body color */
+}
+
+/* Apply Button */
+#acceptBtn {
+  height: 3rem;
+  width: 100%;
+  border: 2px var(--apnaGreen) solid; /* Green border */
+  background: none;
+  color: var(--apnaGreen); /* Green text */
+  border-radius: 1rem;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#acceptBtn:hover {
+  background: var(--apnaGreen);
+  color: var(--bodyColor); /* Text color changes to body color */
+}
+
+/* Resume Options Styling */
+.resume-options {
+  display: flex;
+  flex-direction: column;
+}
+
+.resume-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border: 1px solid var(--resume-option-border-color); /* Light gray border */
+  border-radius: 1rem; /* Rounded corners */
+  transition: background-color 0.3s;
+  height: 2.5rem;
+  position: relative; /* For absolute positioning of the checkmark */
+}
+
+.resume-option:hover {  
+  border: 1px var(--apnaGreen) solid; /* Green border */
+  color: var(--apnaGreen); /* Green text */
+  background-color: var(--resume-option-hover-bg-color); /* Light green background */
+}
+
+.resume-option input[type="radio"] {
+  display: none; /* Hide the default radio button */
+}
+
+.resume-option span {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Style for the checkmark */
+.resume-option.checked {
+  border: 2px solid var(--apnaGreen); /* Green border for selected */
+  color: var(--apnaGreen); /* Green text */
+}
+
+.resume-option.checked::after {
+  content: "\f00c"; /* FontAwesome checkmark */
+  font-family: "Font Awesome 6 Free"; /* FontAwesome font */
+  font-weight: 900; /* Solid style */
+  color: var(--apnaGreen); /* Green color */
+  background-color: var(--whiteFont); /* White background */
+  border-radius: 50%; /* Circle background */
+  font-size: 1.2rem; /* Size of the checkmark */
+}
