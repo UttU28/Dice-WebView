@@ -163,3 +163,12 @@
   border-radius: 50%; /* Circle background */
   font-size: 1.2rem; /* Size of the checkmark */
 }
+
+.keyWord{
+  color: var(--apnaGreen);
+  font-weight: 700;
+}
+
+#jobDescription{
+  color: #999999;
+}

@@ -28,7 +28,7 @@ def allowed_file(filename):
 
 
 def update_html_content(description):
-    keyWords = ['Snowflake', 'MongoDB', 'Azure VM']
+    keyWords = ['Snowflake', 'MongoDB', 'Azure VM', 'Logging', 'APIs', 'Kubernetes', 'Data Lakes', 'Postman', 'Extract', 'GCP Firebase', 'Apache Hadoop', 'JFrog Artifactory', 'AWS', 'Pipelines', 'Security vulnerability management', 'AngularJS', 'Azure SQL Database', 'Burp Suite', 'Bootstrap', 'Kali Linux', 'Monitoring tools', 'Apache Airflow', 'Google Cloud Platform', 'Angular', 'PyTorch', 'Scripting languages', 'AWS S3', 'Load', 'DataBricks', 'Linux shell scripting', 'Continuous Integration/Continuous Delivery', 'Groovy scripts', 'New Relic', 'Node.js', 'Azure Blob Storage', 'Docker containers', 'OWASP ZAP', 'Lean principles', 'ETL', 'Hibernate', 'Continuous Delivery', 'Continuous Improvement', 'Orchestration', 'AWS RDS', 'Java', 'Azure DevOps', 'Oracle', 'Puppet', 'Nagios', 'Grafana', 'Encryption methods', 'C#', 'Cassandra', 'Express.js', 'Data lineage', 'Apache Spark', 'JSON', 'PHP', 'GitOps', 'CI/CD', 'GitHub Actions', 'Blue-Green deployment', 'Mobile Device development', 'Data privacy', 'SQL', 'Agile', 'Python', 'Azure certifications', 'Django', 'ELK Stack', 'NGINX', 'React.js', 'Slack', 'NoSQL', 'Material UI', 'Compliance measures', 'Kibana', 'Scrum', 'GCP Cloud SQL', 'Azure Functions', 'SQL Server', 'Data governance', 'MySQL', 'Elasticsearch', 'Veracode', 'Azure Cosmos DB', 'REST APIs', 'Maven', 'Software Quality Assurance', 'Ansible', 'Microservices architecture', 'JavaScript', 'Windows PowerShell', 'Microservices', 'Vue.js', 'Nessus', 'Apache HTTP Server', 'Flask', 'RESTful APIs', 'Cloud computing', 'React', 'AWS Lambda', 'Azure services', 'ASP.NET', 'AWS services', 'TypeScript', 'Bash scripting', 'TensorFlow', 'Penetration testing', 'HTML', 'Powershell', 'Delta Lake', 'AWS EKS', 'Infrastructure as Code', 'CSS', 'Spring Boot', 'Splunk', 'GCP', 'Fortify', 'Spring Framework', 'ITIL', 'AWS CloudFormation', 'Apache Tomcat', 'NUnit', 'Azure Kubernetes Service', 'Transform', 'Docker', 'XML', 'Data Warehousing', 'Kanban', 'Data cataloging', 'AWS ECS', 'GCP Cloud Functions', 'Shift Left Security', 'Apache Kafka', 'Serverless architecture', 'Amazon Web Services', 'SOAP', 'Vulnerability management', 'Datadog', 'Bash', 'Containerization', 'Configuration management', 'GCP Compute Engine', 'JUnit', 'Continuous Integration', 'Continuous Development', 'Continuous Deployment', 'Network security', 'SonarQube', 'Canary deployment', 'GraphQL', '.NET Framework', 'PostgreSQL', 'OAuth', 'RESTful web services', 'DevSecOps', 'DevOps', 'Penetration Testing', 'Terraform', 'Git', 'Unix shell scripting', 'JIRA', 'Ruby on Rails', 'BigQuery', 'TestNG', 'Data warehousing', 'Power BI', 'GitHub', 'NoSQL databases', 'Metasploit', 'Prometheus', '.NET Core', 'Agile development', 'AWS DynamoDB', 'Identity and access management', 'Secure data communication', 'Bitbucket', 'Data analytics', 'AWS EC2', 'Chef', 'Next.js', 'GCP Cloud Storage', 'Azure security', 'GCP Kubernetes Engine', 'Six Sigma', 'Entity Framework', 'Cucumber', 'Jenkins', 'Confluence', 'Logstash', 'Appium', 'SDLC', 'JWT', 'Observability', 'YAML', 'Serverless architectures', 'Selenium', 'Redis', 'GitLab', 'Metadata management', 'Business intelligence']
     lowercase_keywords = sorted([kw.lower() for kw in keyWords], key=len, reverse=True)
     pattern = re.compile(r'\b(' + '|'.join(map(re.escape, lowercase_keywords)) + r')\b', re.IGNORECASE)
 
@@ -46,6 +46,7 @@ def update_html_content(description):
 @app.route('/')
 def index():
     if 'user' in session:
+        session['lastView'] = getUserLastView(session['email'])
         jobData = loadJobsTill(session['lastView'])
         # Dummy resume data for demonstration
         resumeData = {
@@ -61,7 +62,7 @@ def index():
         for job in jobData:
             job["description"] = update_html_content(job["description"])
 
-        return render_template("index.html", jobData=jobData, resumeData=resumeData, pendingJobs=len(jobData), user=session['user'])
+        return render_template("index.html", jobData=jobData, resumeData=resumeData, pendingJobs=len(jobData), user=session['user'], userEmail=session['email'])
     
     return redirect(url_for('login'))
 

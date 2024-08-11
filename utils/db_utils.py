@@ -72,6 +72,22 @@ def updateLastView(email, newLastView):
         cursor.close()
         connection.close()
 
+def getUserLastView(email):
+    connection = getDbConnection()
+    cursor = connection.cursor()
+    lastView = None
+    try:
+        cursor.execute("SELECT last_view FROM users WHERE email = ?", (email,))
+        result = cursor.fetchone()
+        if result:
+            lastView = result[0]
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+    return lastView
+
 # Job Management
 def loadJobsTill(lastView):
     connection = getDbConnection()
