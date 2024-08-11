@@ -5,6 +5,8 @@ import pyodbc
 from config import AzureSQLConfig
 from datetime import datetime, timezone
 
+
+
 # Connection Management
 def getDbConnection():
     connection = pyodbc.connect(AzureSQLConfig.connectionString)
@@ -72,6 +74,22 @@ def updateLastView(email, newLastView):
         cursor.close()
         connection.close()
 
+def getUserLastView(email):
+    connection = getDbConnection()
+    cursor = connection.cursor()
+    lastView = None
+    try:
+        cursor.execute("SELECT last_view FROM users WHERE email = ?", (email,))
+        result = cursor.fetchone()
+        if result:
+            lastView = result[0]
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+    return lastView
+
 # Job Management
 def loadJobsTill(lastView):
     connection = getDbConnection()
@@ -122,13 +140,13 @@ def addToApplyQueue(jobID, selectedResume, email):
         connection.close()
 
 # Resume Management
-def addResumeToDatabase(resumeName, email):
+def addResumeToDatabase(resumeID, resumeName, email):
     connection = getDbConnection()
     cursor = connection.cursor()
     try:
         cursor.execute(
-            "INSERT INTO resumeList (resumeName, email) VALUES (?, ?)",
-            (resumeName, email)
+            "INSERT INTO resumeList (resumeId, resumeName, email) VALUES (?, ?, ?)",
+            (resumeID, resumeName, email)
         )
         connection.commit()
     except pyodbc.Error as e:

@@ -2,17 +2,18 @@
 # config.py
 
 import os
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'supersecretkey')  # For session management, CSRF protection, etc.
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
 class AzureSQLConfig(Config):
-    databaseServer = 'dice-sql.database.windows.net'
-    databaseName = 'dice_sql_database'
-    databaseUsername = 'iAmRoot'
-    databasePassword = 'Qwerty@213'
+    databaseServer = os.getenv('databaseServer')
+    databaseName = os.getenv('databaseName')
+    databaseUsername = os.getenv('databaseUsername')
+    databasePassword = os.getenv('databasePassword')
     connectionString = (
         f"Driver={{ODBC Driver 17 for SQL Server}};"
         f"Server=tcp:{databaseServer},1433;"
@@ -21,3 +22,15 @@ class AzureSQLConfig(Config):
         f"Pwd={databasePassword};"
         f"Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
     )
+
+class AzureBLOBConfig(Config):
+    AZURE_CONNECTION_STRING = os.getenv('blobConnectionString')
+    CONTAINER_NAME = 'resume-data'
+
+
+
+# databaseServer = 'dice-sql.database.windows.net'
+# databaseName = 'dice_sql_database'
+# databaseUsername = 'iAmRoot'
+# databasePassword = 'Qwerty@213'
+# connectionString = f'Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:{databaseServer},1433;Database={databaseName};Uid={databaseUsername};Pwd={databasePassword};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
