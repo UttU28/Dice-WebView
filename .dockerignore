@@ -30,6 +30,7 @@ Dockerfile
 *.tmp
 *.pdf
 *.yml
+*.tf
 
 allResume/
 .gitignore

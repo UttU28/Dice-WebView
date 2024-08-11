@@ -2,6 +2,9 @@
 # config.py
 
 import os
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'supersecretkey')  # For session management, CSRF protection, etc.

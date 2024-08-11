@@ -5,6 +5,8 @@ import pyodbc
 from config import AzureSQLConfig
 from datetime import datetime, timezone
 
+
+
 # Connection Management
 def getDbConnection():
     connection = pyodbc.connect(AzureSQLConfig.connectionString)
