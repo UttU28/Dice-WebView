@@ -138,13 +138,13 @@ def addToApplyQueue(jobID, selectedResume, email):
         connection.close()
 
 # Resume Management
-def addResumeToDatabase(resumeName, email):
+def addResumeToDatabase(resumeID, resumeName, email):
     connection = getDbConnection()
     cursor = connection.cursor()
     try:
         cursor.execute(
-            "INSERT INTO resumeList (resumeName, email) VALUES (?, ?)",
-            (resumeName, email)
+            "INSERT INTO resumeList (resumeId, resumeName, email) VALUES (?, ?, ?)",
+            (resumeID, resumeName, email)
         )
         connection.commit()
     except pyodbc.Error as e:

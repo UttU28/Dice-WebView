@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 from config import AzureSQLConfig
 from utils.db_utils import *
+from utils.storage_utils import *
 from utils.email_utils import sendOtpEmail
 import re, os
 import random
@@ -197,12 +198,14 @@ def manageResume():
             return redirect(request.url)
         
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
+            resumeName = file.filename
+            resumeID = upload_to_blob(file, str(datetime.now(timezone.utc).timestamp()).replace('.','') + str(random.randint(100,999)))
+            # file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            # file.save(file_path)
+
             
             # Add to database
-            addResumeToDatabase(filename, email)
+            addResumeToDatabase(resumeID, resumeName, email)
             flash('Resume uploaded successfully!', 'success')
             return redirect(url_for('manageResume'))
 
