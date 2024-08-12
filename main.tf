@@ -35,8 +35,8 @@ resource "azurerm_container_app_environment" "app_environment" {
 
 resource "azurerm_container_app" "dicesaralapply11" {
   name                         = "dicesaralapply11-app"
-  container_app_environment_id = data.azurerm_container_app_environment.app_environment.id
-  resource_group_name          = data.azurerm_resource_group.resource_group.name
+  container_app_environment_id = azurerm_container_app_environment.app_environment.id
+  resource_group_name          = azurerm_resource_group.resource_group.name
   revision_mode                = "Single"
 
   template {
