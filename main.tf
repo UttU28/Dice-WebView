@@ -55,18 +55,6 @@ resource "azurerm_container_app" "dicesaralapply11" {
         value = local.resumeContainer
       }
     }
-
-    ingress {
-      external_enabled         = true
-      target_port              = 50505
-      transport                = "auto"
-      allow_insecure_connections = false
-
-      ip_security_restriction {
-        action     = "Allow"
-        ip_address = "0.0.0.0/0"
-      }
-    }
   }
 
   secret {
@@ -78,5 +66,17 @@ resource "azurerm_container_app" "dicesaralapply11" {
     server               = "${local.acrName}.azurecr.io"
     username             = local.acrName
     password_secret_name = "registry-credentials"
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+      az containerapp ingress enable \
+        --name ${self.name} \
+        --resource-group ${self.resource_group_name} \
+        --type external \
+        --target-port 50505 \
+        --transport auto \
+        --allow-insecure false
+    EOT
   }
 }
