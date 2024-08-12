@@ -16,7 +16,7 @@ terraform {
 
 resource "azurerm_resource_group" "resource_group" {
   name     = local.webapp-rg
-  location = local.general-location
+  location = "Central US"
 }
 
 resource "azurerm_log_analytics_workspace" "analytics_workspace" {
