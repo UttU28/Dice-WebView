@@ -12,24 +12,10 @@ terraform {
   }
 }
 
-# resource "azurerm_resource_group" "resource_group" {
-#   name     = local.webapp-rg
-#   location = "East Asia"
-# }
-
-# resource "azurerm_log_analytics_workspace" "analytics_workspace" {
-#   name                = "dicewebviewloganalyticsworkspace"
-#   location            = azurerm_resource_group.resource_group.location
-#   resource_group_name = azurerm_resource_group.resource_group.name
-#   sku                 = "PerGB2018"
-#   retention_in_days   = 30
-# }
-
 data "azurerm_container_app_environment" "app_environment" {
-  name                = "this-dice-jobscraping-app-environment"  # Replace with your environment's name
+  name                = "this-dice-jobscraping-app-environment"
   resource_group_name = "this-dice-jobscraping-rg"
 }
-
 
 resource "azurerm_container_app" "dicesaralapply11" {
   name                         = "dicesaralapply11-app"
@@ -69,12 +55,25 @@ resource "azurerm_container_app" "dicesaralapply11" {
         value = local.resumeContainer
       }
     }
+
+    ingress {
+      external_enabled         = true
+      target_port              = 50505
+      transport                = "auto"
+      allow_insecure_connections = false
+
+      ip_security_restriction {
+        action     = "Allow"
+        ip_address = "0.0.0.0/0"
+      }
+    }
   }
 
   secret {
     name  = "registry-credentials"
     value = local.acrPassword
   }
+
   registry {
     server               = "${local.acrName}.azurecr.io"
     username             = local.acrName
