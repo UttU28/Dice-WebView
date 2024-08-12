@@ -12,8 +12,6 @@ terraform {
   }
 }
 
-
-
 resource "azurerm_resource_group" "resource_group" {
   name     = local.webapp-rg
   location = "East Asia"
