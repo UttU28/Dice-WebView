@@ -52,6 +52,7 @@ class Config:
 
 class AzureSQLConfig(Config):
     # databaseServer = os.getenv('databaseServer')
+    print(os.getenv('databaseServer'), "os.getenv('databaseServer')os.getenv('databaseServer')")
     # databaseName = os.getenv('databaseName')
     # databaseUsername = os.getenv('databaseUsername')
     # databasePassword = os.getenv('databasePassword')

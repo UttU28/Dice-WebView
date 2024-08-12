@@ -12,63 +12,69 @@ terraform {
   }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = local.webapp-rg
-  location = local.general-location
+
+data "azurerm_resource_group" "resource_group" {
+  name     = local.jobscraping-rg
 }
 
-resource "azurerm_service_plan" "example" {
-  name                = local.webapp-service-plan
-  resource_group_name = azurerm_resource_group.example.name
+data "azurerm_log_analytics_workspace" "analytics_workspace" {
+  name                = local.jobscraping-log-analytics-workspace
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+}
+
+data "azurerm_container_app_environment" "app_environment" {
+  name                = local.jobscraping-app-environment
   location            = local.general-location
-  os_type             = "Linux"
-  sku_name            = "B1"
+  resource_group_name = data.azurerm_resource_group.resource_group.name
 }
 
-resource "azurerm_linux_web_app" "example" {
-  name                = local.webapp-name
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_service_plan.example.location
-  service_plan_id     = azurerm_service_plan.example.id
+resource "azurerm_container_app" "dicesaralapply11" {
+  name                         = "dicesaralapply11-app"
+  container_app_environment_id = data.azurerm_container_app_environment.app_environment.id
+  resource_group_name          = data.azurerm_resource_group.resource_group.name
+  revision_mode                = "Single"
 
-  site_config {
-    always_on = true
-    application_stack {
-      docker_image_name        = local.acrUrl
-      docker_registry_username = local.acrName
-      docker_registry_password = local.acrPassword
-    }
-  }
-  app_settings = {
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "true" # Ensures file system storage is enabled
-    "SCM_LOGSTREAM_ENABLED"               = "true" # Enables Logstream access
-  }
+  template {
+    container {
+      name   = "${local.acrName}-random-string"
+      image  = local.acrUrl
+      cpu    = 0.75
+      memory = "1.5Gi"
 
-  logs {
-    http_logs {
-      file_system {
-        retention_in_days = 30
-        retention_in_mb   = 100
+      env {
+        name  = "databaseServer"
+        value = local.databaseServer
+      }
+      env {
+        name  = "databaseName"
+        value = local.databaseName
+      }
+      env {
+        name  = "databaseUsername"
+        value = local.databaseUsername
+      }
+      env {
+        name  = "databasePassword"
+        value = local.databasePassword
+      }
+      env {
+        name  = "blobConnectionString"
+        value = local.blobConnectionString
+      }
+      env {
+        name  = "resumeContainer"
+        value = local.resumeContainer
       }
     }
+  }
 
-    application_logs {
-      file_system_level = "Information"
-    }
+  secret {
+    name  = "registry-credentials"
+    value = local.acrPassword
+  }
+  registry {
+    server               = "${local.acrName}.azurecr.io"
+    username             = local.acrName
+    password_secret_name = "registry-credentials"
   }
 }
-
-resource "null_resource" "restart_web_app" {
-  depends_on = [azurerm_linux_web_app.example]
-
-  provisioner "local-exec" {
-    command = <<EOT
-    sleep 60
-
-    az webapp restart --resource-group ${azurerm_resource_group.example.name} --name ${azurerm_linux_web_app.example.name}
-    EOT
-  }
-}
-
-
-

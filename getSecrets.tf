@@ -69,6 +69,21 @@ data "azurerm_key_vault_secret" "acrPassword" {
   key_vault_id = data.azurerm_key_vault.thiskeyvault.id
 }
 
+data "azurerm_key_vault_secret" "jobscraping-rg" {
+  name         = "jobscraping-rg"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "jobscraping-log-analytics-workspace" {
+  name         = "jobscraping-log-analytics-workspace"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
+data "azurerm_key_vault_secret" "jobscraping-app-environment" {
+  name         = "jobscraping-app-environment"
+  key_vault_id = data.azurerm_key_vault.thiskeyvault.id
+}
+
 # Define local variables to store the secret values
 locals {
   backend-rg           = data.azurerm_key_vault_secret.backend-rg.value
@@ -84,5 +99,8 @@ locals {
   acrName              = data.azurerm_key_vault_secret.acrName.value
   acrPassword          = data.azurerm_key_vault_secret.acrPassword.value
   acrUrl               = "${local.acrName}.azurecr.io/${local.webapp-image}:latest"
+  jobscraping-rg                      = data.azurerm_key_vault_secret.jobscraping-rg.value
+  jobscraping-log-analytics-workspace = data.azurerm_key_vault_secret.jobscraping-log-analytics-workspace.value
+  jobscraping-app-environment         = data.azurerm_key_vault_secret.jobscraping-app-environment.value
 }
 
