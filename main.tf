@@ -13,19 +13,24 @@ terraform {
 }
 
 
-data "azurerm_resource_group" "resource_group" {
-  name     = local.jobscraping-rg
+
+resource "azurerm_resource_group" "resource_group" {
+  name     = local.webapp-rg
+  location = local.general-location
 }
 
-data "azurerm_log_analytics_workspace" "analytics_workspace" {
-  name                = local.jobscraping-log-analytics-workspace
-  resource_group_name = data.azurerm_resource_group.resource_group.name
+resource "azurerm_log_analytics_workspace" "analytics_workspace" {
+  name                = "dicewebviewloganalyticsworkspace"
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
 }
 
-data "azurerm_container_app_environment" "app_environment" {
-  name                = local.jobscraping-app-environment
-  location            = local.general-location
-  resource_group_name = data.azurerm_resource_group.resource_group.name
+resource "azurerm_container_app_environment" "app_environment" {
+  name                = local.webapp-service-plan
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
 }
 
 resource "azurerm_container_app" "dicesaralapply11" {
