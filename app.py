@@ -3,8 +3,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_from_directory
 from flask_bcrypt import Bcrypt
-from werkzeug.utils import secure_filename
-from config import AzureSQLConfig
+# from config import AzureSQLConfig
 from utils.db_utils import *
 from utils.storage_utils import *
 from utils.email_utils import sendOtpEmail
@@ -13,7 +12,7 @@ import random
 
 # Initialize Flask app
 app = Flask(__name__)
-app.config.from_object(AzureSQLConfig)
+# app.config.from_object(AzureSQLConfig)
 
 # Initialize bcrypt for password hashing
 bcrypt = Bcrypt(app)
@@ -220,5 +219,5 @@ def delete_resume(resume_id):
 
 
 if __name__ == '__main__':
-    # app.run(debug=True, host="0.0.0.0", port=5000)
-    app.run()
+    app.run(debug=True, host="0.0.0.0", port=5000)
+    # app.run()
