@@ -1,6 +1,6 @@
 trigger:
-# - main
-- none
+- main
+# - none
 
 variables:
   azureSubscription: 'dicePipeline'
