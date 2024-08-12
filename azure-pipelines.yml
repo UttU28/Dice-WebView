@@ -15,23 +15,32 @@ variables:
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
 
 jobs:
-# - job: GetSecrets
-#   displayName: 'Get Secrets from Key Vault'
-#   steps:
-#   - task: AzureKeyVault@2
-#     displayName: 'Get Secrets from Key Vault'
-#     inputs:
-#       azureSubscription: '$(azureSubscription)'
-#       KeyVaultName: 'thisdicekeyvault'
-#       SecretsFilter: '*'
-#       RunAsPreJob: true
+- job: GetSecrets
+  displayName: 'Get Secrets from Key Vault'
+  steps:
+  - task: AzureKeyVault@2
+    displayName: 'Get Secrets from Key Vault'
+    inputs:
+      azureSubscription: '$(azureSubscription)'
+      KeyVaultName: 'thisdicekeyvault'
+      SecretsFilter: '*'
+      RunAsPreJob: true
 
-# - job: Build
-#   displayName: 'Build Container Image'
-#   dependsOn: GetSecrets
-#   pool:
-#     vmImage: 'ubuntu-latest'
-#   steps:
+- job: Build
+  displayName: 'Build Container Image'
+  dependsOn: GetSecrets
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+
+  - task: Docker@2
+    displayName: Build and push an image to container registry
+    inputs:
+      containerRegistry: '$(containerRegistry)'
+      repository: '$(imageName)'
+      command: buildAndPush
+      Dockerfile: '$(dockerfilePath)'
+      tags: '$(imageTag)'
 #   - task: Docker@2
 #     displayName: Build and push an image to container registry
 #     inputs:
@@ -81,54 +90,54 @@ jobs:
 #         Dockerfile: '$(dockerfilePath)'
 #         tags: '$(imageTag)'
 
-- job: TerraformTask
-  displayName: 'Deploy Terraform Infra'
-  # dependsOn: DeployToACR
-  # dependsOn: CreateAppServicePlan
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-    - task: AzureKeyVault@2
-      displayName: 'Get Secrets from Key Vault'
-      inputs:
-        azureSubscription: '$(azureSubscription)'
-        KeyVaultName: 'thisdicekeyvault'
-        SecretsFilter: '*'
-        RunAsPreJob: true
+# - job: TerraformTask
+#   displayName: 'Deploy Terraform Infra'
+#   dependsOn: DeployToACR
+#   # dependsOn: CreateAppServicePlan
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   steps:
+#     - task: AzureKeyVault@2
+#       displayName: 'Get Secrets from Key Vault'
+#       inputs:
+#         azureSubscription: '$(azureSubscription)'
+#         KeyVaultName: 'thisdicekeyvault'
+#         SecretsFilter: '*'
+#         RunAsPreJob: true
   
-    - task: JasonBJohnson.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@1
-      displayName: Install Terraform
+#     - task: JasonBJohnson.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@1
+#       displayName: Install Terraform
 
-    - task: AzureCLI@2
-      displayName: "Terraform INIT"
-      inputs:
-        azureSubscription: dicePipeline
-        scriptType: bash
-        addSpnToEnvironment: true
-        scriptLocation: inlineScript
-        inlineScript: |
-          export ARM_CLIENT_ID='$(arm-client-id)'
-          export ARM_CLIENT_SECRET='$(arm-client-secret)'
-          export ARM_TENANT_ID='$(arm-tenant-id)'
-          export ARM_SUBSCRIPTION_ID='$(arm-subscription-id)'
+#     - task: AzureCLI@2
+#       displayName: "Terraform INIT"
+#       inputs:
+#         azureSubscription: dicePipeline
+#         scriptType: bash
+#         addSpnToEnvironment: true
+#         scriptLocation: inlineScript
+#         inlineScript: |
+#           export ARM_CLIENT_ID='$(arm-client-id)'
+#           export ARM_CLIENT_SECRET='$(arm-client-secret)'
+#           export ARM_TENANT_ID='$(arm-tenant-id)'
+#           export ARM_SUBSCRIPTION_ID='$(arm-subscription-id)'
     
-          terraform init
+#           terraform init
  
-    - task: TerraformCLI@1
-      displayName: Terraform PLAN
-      inputs:
-        command: plan
-        azureSubscription: dicePipeline
-        environmentServiceName: dicePipeline
-        runAzLogin: true
-        allowTelemetryCollection: true
+#     - task: TerraformCLI@1
+#       displayName: Terraform PLAN
+#       inputs:
+#         command: plan
+#         azureSubscription: dicePipeline
+#         environmentServiceName: dicePipeline
+#         runAzLogin: true
+#         allowTelemetryCollection: true
 
  
-    - task: TerraformCLI@1
-      displayName: Terraform APPLY
-      inputs:
-        command: apply
-        azureSubscription: dicePipeline
-        environmentServiceName: dicePipeline
-        runAzLogin: true
-        allowTelemetryCollection: true
+#     - task: TerraformCLI@1
+#       displayName: Terraform APPLY
+#       inputs:
+#         command: apply
+#         azureSubscription: dicePipeline
+#         environmentServiceName: dicePipeline
+#         runAzLogin: true
+#         allowTelemetryCollection: true
