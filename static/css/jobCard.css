@@ -115,6 +115,7 @@
 }
 
 /* Resume Options Styling */
+/* Resume Options Styling */
 .resume-options {
   display: flex;
   flex-direction: column;
@@ -128,12 +129,12 @@
   padding: 0.5rem;
   border: 1px solid var(--resume-option-border-color); /* Light gray border */
   border-radius: 1rem; /* Rounded corners */
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, border-color 0.3s;
   height: 2.5rem;
   position: relative; /* For absolute positioning of the checkmark */
 }
 
-.resume-option:hover {  
+.resume-option:hover {
   border: 1px var(--apnaGreen) solid; /* Green border */
   color: var(--apnaGreen); /* Green text */
   background-color: var(--resume-option-hover-bg-color); /* Light green background */
@@ -149,20 +150,12 @@
 }
 
 /* Style for the checkmark */
-.resume-option.checked {
+.resume-option.selected {
   border: 2px solid var(--apnaGreen); /* Green border for selected */
   color: var(--apnaGreen); /* Green text */
+  background-color: var(--resume-option-selected-bg-color); /* Light green background */
 }
 
-.resume-option.checked::after {
-  content: "\f00c"; /* FontAwesome checkmark */
-  font-family: "Font Awesome 6 Free"; /* FontAwesome font */
-  font-weight: 900; /* Solid style */
-  color: var(--apnaGreen); /* Green color */
-  background-color: var(--whiteFont); /* White background */
-  border-radius: 50%; /* Circle background */
-  font-size: 1.2rem; /* Size of the checkmark */
-}
 
 .keyWord{
   color: var(--apnaGreen);

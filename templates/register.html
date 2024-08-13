@@ -21,7 +21,8 @@
         <form id="registerForm" class="thisForm" method="POST" action="{{ url_for('register') }}">
             <input type="text" name="name" placeholder="Name" value="{{ request.form.get('name', '') }}" required>
             <input type="email" name="email" placeholder="Email" value="{{ request.form.get('email', '') }}" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="dicepassword" placeholder="Dice Password" value="{{ request.form.get('dicepassword', '') }}" required>
+            <input type="password" name="password" placeholder="Pass-4-this App" required>
             <button type="submit">Register</button>
         </form>
 

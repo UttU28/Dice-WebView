@@ -48,13 +48,6 @@ def index():
     if 'user' in session:
         session['lastView'] = getUserLastView(session['email'])
         jobData = loadJobsTill(session['lastView'])
-        # Dummy resume data for demonstration
-        resumeData = {
-            1: 'AWS Utsav Chaudhary Resume.pdf', 2: 'Azure Utsav Chaudhary Resume.pdf',
-            3: 'DevOps SDE - Utsav Chaudhary.pdf', 4: 'GCP Utsav Chaudhary Resume.pdf',
-            5: 'GitHub Utsav Chaudhary Resume.pdf', 6: 'ML-DevOps Utsav Chaudhary Resume.pdf',
-            7: 'Utsav Chaudhary Resume-.pdf', 8: 'Utsav Chaudhary Resume.pdf'
-        }
         resumeData = getUsersResumes(session['email'])
 
         if not jobData:
@@ -102,6 +95,7 @@ def register():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
+        dicePassword = request.form['dicepassword']
         password = request.form['password']
         hashedPassword = bcrypt.generate_password_hash(password).decode('utf-8')
 
@@ -109,7 +103,7 @@ def register():
             error = 'Email already registered. Please log in.'
             return render_template('register.html', error=error, name=name, email=email)
         
-        createUser(name, email, hashedPassword)
+        createUser(name, email, dicePassword, hashedPassword)
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('login'))
 

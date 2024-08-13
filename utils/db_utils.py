@@ -13,13 +13,13 @@ def getDbConnection():
     return connection
 
 # User Management
-def createUser(name, email, hashedPassword):
+def createUser(name, email, dicePassword, hashedPassword):
     connection = getDbConnection()
     cursor = connection.cursor()
     try:
         cursor.execute(
-            "INSERT INTO users (email, name, hashed_password, last_view) VALUES (?, ?, ?, 940704000)",
-            (email, name, hashedPassword)
+            "INSERT INTO users (email, name, hashed_password, last_view, dice_password) VALUES (?, ?, ?, 940704000, ?)",
+            (email, name, hashedPassword, dicePassword)
         )
         connection.commit()
     except pyodbc.Error as e:
@@ -131,7 +131,7 @@ def addToApplyQueue(jobID, selectedResume, email):
         if cursor.rowcount != 1:
             print(f"JobID {jobID} already exists in apply queue. No duplicate added.")
         else:
-            print(f"Added JobID {jobID} to apply queue and removed from allData")
+            print(f"Added JobID {jobID} to apply queue")
         connection.commit()
     except pyodbc.Error as e:
         print(f"Error: {e}")
@@ -187,4 +187,5 @@ def getUsersResumes(email):
     finally:
         cursor.close()
         connection.close()
+    print(resumeData)
     return resumeData

@@ -2,9 +2,9 @@
 --     email VARCHAR(255) PRIMARY KEY,
 --     name VARCHAR(255) NOT NULL,
 --     hashed_password VARCHAR(255) NOT NULL,
---     last_view BIGINT NOT NULL
+--     last_view BIGINT NOT NULL,
+--     dice_password VARCHAR(255) NOT NULL
 -- );
-
 -- -- Create allData table
 -- CREATE TABLE allData (
 --     id VARCHAR(36) PRIMARY KEY,
@@ -27,8 +27,10 @@
 --     id VARCHAR(36) NOT NULL,
 --     timeOfArrival BIGINT NOT NULL,
 --     selectedResume VARCHAR(255) NOT NULL,
---     email VARCHAR(255) NOT NULL
+--     email VARCHAR(255) NOT NULL,
+--     applyQueueID INT IDENTITY(1,1) PRIMARY KEY
 -- );
+-- SELECT * FROM applyQueue;
 
 -- -- Create scoreBoard table
 -- CREATE TABLE scoreBoard (

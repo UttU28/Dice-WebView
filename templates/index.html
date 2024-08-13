@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <title>Dice Saral Apply</title>
 </head>
 
@@ -65,7 +67,7 @@
                 <div class="resume-options">
                     {% for resume_id, resume_name in resumeData.items() %}
                     <label class="resume-option">
-                        <input type="radio" name="resume_id" id="resume_{{ resume_id }}" value="{{ resume_name }}">
+                        <input type="radio" name="resume_id" id="resume_{{ resume_id }}" value="{{ resume_id }}">
                         <span>{{ resume_name }}</span>
                     </label>
                     {% endfor %}
@@ -81,128 +83,134 @@
 
     <!--=============== MAIN JS ===============-->
     <script>
-        $(document).ready(function () {
-            let currentIndex = 0;
+    $(document).ready(function () {
+        let currentIndex = 0;
 
-            function timeAgo(timestamp) {
-                const current = new Date();
-                const previous = new Date(timestamp * 1000); // Convert UNIX timestamp to milliseconds
-                const diff = current - previous;
+        function timeAgo(timestamp) {
+            const current = new Date();
+            const previous = new Date(timestamp * 1000); // Convert UNIX timestamp to milliseconds
+            const diff = current - previous;
 
-                const seconds = Math.floor(diff / 1000);
-                const minutes = Math.floor(seconds / 60);
-                const hours = Math.floor(minutes / 60);
-                const days = Math.floor(hours / 24);
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
 
-
-                if (days > 0) {
-                    return days + " days ago";
-                } else if (hours > 0) {
-                    return hours + " hours ago";
-                } else if (minutes > 0) {
-                    return minutes + " minutes ago";
-                } else {
-                    return seconds + " seconds ago";
-                }
+            if (days > 0) {
+                return days + " days ago";
+            } else if (hours > 0) {
+                return hours + " hours ago";
+            } else if (minutes > 0) {
+                return minutes + " minutes ago";
+            } else {
+                return seconds + " seconds ago";
             }
-
-            function updateJob(index) {
-                if (index < {{ pendingJobs }}) {
-                    const job = {{ jobData | tojson }};
-                    console.log(job[index])
-                    $('#jobTitle').text(job[index].title);
-                    $('#companyName').text(job[index].company);
-                    console.log(timeAgo(job[index].timeOfArrival))
-                    $('#timeAgo').text(timeAgo(job[index].timeOfArrival));
-                    $('#timeAgo').data('lastView', job[index].timeOfArrival);
-                    $('#jobDescription').html(job[index].description);
-                    $('#jobCard').data('job-id', job[index].id);
-                } else {
-                    // No more jobs
-                    window.location.href = "{{ url_for('index') }}";
-                    // $.ajax({
-                    //     url: "{{ url_for('noMoreJobs') }}",
-                    //     method: "GET",
-                    //     success: function (response) {
-                    //         $('body').html(response);
-                    //     }
-                    // });
-                }
-            }
-
-            $('#acceptBtn').click(function () {
-                const jobId = $('#jobCard').data('job-id');
-                const selectedResume = $('input[name="resume_id"]:checked').val();
-                const lastView = $('#timeAgo').data('lastView');
-                $.ajax({
-                    url: "{{ url_for('jobAccepted') }}",
-                    method: "POST",
-                    data: {
-                        jobID: jobId,
-                        lastView: lastView,
-                        selectedResume: selectedResume
-                    },
-                    success: function () {
-                        currentIndex++;
-                        updateJob(currentIndex);
-                    },
-                    error: function () {
-                        alert('Error accepting job');
-                    }
-                });
-                toggleSelectResume();
-            });
-
-            $('#rejectBtn').click(function () {
-                const lastView = $('#timeAgo').data('lastView');
-                console.log(lastView, "lastView")
-                $.ajax({
-                    url: "{{ url_for('jobRejected') }}",
-                    method: "POST",
-                    data: {
-                        lastView: lastView
-                    },
-                    success: function () {
-                        currentIndex++;
-                        updateJob(currentIndex);
-                    },
-                    error: function () {
-                        alert('Error rejecting job');
-                    }
-                });
-            });
-
-            // Initial job load
-            updateJob(currentIndex);
-        });
-
-        function toggleSelectResume() {
-            var jobCard = document.getElementById('jobCard');
-            var selectResumeCard = document.getElementById('selectResumeCard');
-
-            jobCard.classList.toggle('hidden');
-            selectResumeCard.classList.toggle('hidden');
         }
 
-        document.getElementById('nav-toggle').addEventListener('click', function () {
-            document.getElementById('nav-menu').classList.toggle('active');
+        function updateJob(index) {
+            if (index < {{ pendingJobs }}) {
+                const job = {{ jobData | tojson }};
+                console.log(job[index])
+                $('#jobTitle').text(job[index].title);
+                $('#companyName').text(job[index].company);
+                console.log(timeAgo(job[index].timeOfArrival))
+                $('#timeAgo').text(timeAgo(job[index].timeOfArrival));
+                $('#timeAgo').data('lastView', job[index].timeOfArrival);
+                $('#jobDescription').html(job[index].description);
+                $('#jobCard').data('job-id', job[index].id);
+            } else {
+                // No more jobs
+                window.location.href = "{{ url_for('index') }}";
+                // $.ajax({
+                //     url: "{{ url_for('noMoreJobs') }}",
+                //     method: "GET",
+                //     success: function (response) {
+                //         $('body').html(response);
+                //     }
+                // });
+            }
+        }
+
+        $('#acceptBtn').click(function () {
+            const jobId = $('#jobCard').data('job-id');
+            const selectedResume = $('input[name="resume_id"]:checked').val();
+            const lastView = $('#timeAgo').data('lastView');
+            $.ajax({
+                url: "{{ url_for('jobAccepted') }}",
+                method: "POST",
+                data: {
+                    jobID: jobId,
+                    lastView: lastView,
+                    selectedResume: selectedResume
+                },
+                success: function () {
+                    currentIndex++;
+                    updateJob(currentIndex);
+                },
+                error: function () {
+                    alert('Error accepting job');
+                }
+            });
+            toggleSelectResume();
         });
 
-        document.getElementById('nav-close').addEventListener('click', function () {
-            document.getElementById('nav-menu').classList.remove('active');
-        });
-
-        // Add this script to handle touch events for mobile devices
-        document.addEventListener('DOMContentLoaded', () => {
-            // Get all buttons with hover effects
-            const buttons = document.querySelectorAll('#rejectBtn, #resumeBtn, #acceptBtn');
-
-            buttons.forEach(button => {
-                button.addEventListener('touchend', () => {
-                    button.classList.remove('hover');
-                });
+        $('#rejectBtn').click(function () {
+            const lastView = $('#timeAgo').data('lastView');
+            console.log(lastView, "lastView")
+            $.ajax({
+                url: "{{ url_for('jobRejected') }}",
+                method: "POST",
+                data: {
+                    lastView: lastView
+                },
+                success: function () {
+                    currentIndex++;
+                    updateJob(currentIndex);
+                },
+                error: function () {
+                    alert('Error rejecting job');
+                }
             });
         });
+
+        // Initial job load
+        updateJob(currentIndex);
+
+        // Handle resume selection
+        $('input[name="resume_id"]').change(function () {
+            $('.resume-option').removeClass('selected'); // Remove 'selected' class from all options
+            $(this).closest('.resume-option').addClass('selected'); // Add 'selected' class to the chosen option
+        });
+    });
+
+    function toggleSelectResume() {
+        var jobCard = document.getElementById('jobCard');
+        var selectResumeCard = document.getElementById('selectResumeCard');
+
+        jobCard.classList.toggle('hidden');
+        selectResumeCard.classList.toggle('hidden');
+    }
+
+    document.getElementById('nav-toggle').addEventListener('click', function () {
+        document.getElementById('nav-menu').classList.toggle('active');
+    });
+
+    document.getElementById('nav-close').addEventListener('click', function () {
+        document.getElementById('nav-menu').classList.remove('active');
+    });
+
+    // Add this script to handle touch events for mobile devices
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get all buttons with hover effects
+        const buttons = document.querySelectorAll('#rejectBtn, #resumeBtn, #acceptBtn');
+
+        buttons.forEach(button => {
+            button.addEventListener('touchend', () => {
+                button.classList.remove('hover');
+            });
+        });
+    });
+
     </script>
 </body>
 
