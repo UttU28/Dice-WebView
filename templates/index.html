@@ -61,7 +61,7 @@
             <div class="card-header">
                 <input type="hidden" name="job_id" value="{{ jobData[0].id }}">
                 <h2>Select Resume</h2>
-                <p>Sambhal K Gandu..</p>
+                <p>Select resume for this Job Role.. and press APPLY</p>
             </div>
             <div class="card-body">
                 <div class="resume-options">
@@ -118,6 +118,15 @@
                 $('#timeAgo').data('lastView', job[index].timeOfArrival);
                 $('#jobDescription').html(job[index].description);
                 $('#jobCard').data('job-id', job[index].id);
+
+                // Check visibility of elements
+                const jobCard = document.getElementById('jobCard');
+                const selectResumeCard = document.getElementById('selectResumeCard');
+
+                // If selectResumeCard is visible, toggle the visibility of both cards
+                if (!selectResumeCard.classList.contains('hidden') && jobCard.classList.contains('hidden')) {
+                    toggleSelectResume();
+                }
             } else {
                 // No more jobs
                 window.location.href = "{{ url_for('index') }}";

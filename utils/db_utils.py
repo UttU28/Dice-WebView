@@ -187,5 +187,5 @@ def getUsersResumes(email):
     finally:
         cursor.close()
         connection.close()
-    print(resumeData)
+    # print(resumeData)
     return resumeData

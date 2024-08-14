@@ -149,9 +149,9 @@ def forgotPassword():
             return redirect(url_for('resetPassword'))
         
         error = 'Email not found. Please try again.'
-        return render_template('forgot_password.html', error=error, email=email)
+        return render_template('forgotPassword.html', error=error, email=email)
 
-    return render_template('forgot_password.html')
+    return render_template('forgotPassword.html')
 
 @app.route('/resetPassword', methods=['GET', 'POST'])
 def resetPassword():
@@ -213,5 +213,5 @@ def delete_resume(resume_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=5000)
-    # app.run()
+    # app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run()
