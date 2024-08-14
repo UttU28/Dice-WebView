@@ -16,10 +16,11 @@ def getDbConnection():
 def createUser(name, email, dicePassword, hashedPassword):
     connection = getDbConnection()
     cursor = connection.cursor()
+    timestamp = int(datetime.now(timezone.utc).timestamp())
     try:
         cursor.execute(
-            "INSERT INTO users (email, name, hashed_password, last_view, dice_password) VALUES (?, ?, ?, 940704000, ?)",
-            (email, name, hashedPassword, dicePassword)
+            "INSERT INTO users (email, name, hashed_password, last_view, dice_password) VALUES (?, ?, ?, ?, ?)",
+            (email, name, hashedPassword, timestamp, dicePassword)
         )
         connection.commit()
     except pyodbc.Error as e:
