@@ -193,11 +193,6 @@ def manageResume():
         if file and allowed_file(file.filename):
             resumeName = file.filename
             resumeID = upload_to_blob(file, str(datetime.now(timezone.utc).timestamp()).replace('.','') + str(random.randint(100,999)))
-            # file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            # file.save(file_path)
-
-            
-            # Add to database
             addResumeToDatabase(resumeID, resumeName, email)
             flash('Resume uploaded successfully!', 'success')
             return redirect(url_for('manageResume'))
