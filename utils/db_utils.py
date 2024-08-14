@@ -121,12 +121,9 @@ def addToApplyQueue(jobID, selectedResume, email):
         cursor.execute(
             """
                 INSERT INTO applyQueue (jobID, timeOfArrival, selectedResume, email)
-                SELECT ?, ?, ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1 FROM applyQueue WHERE jobID = ?
-                );
+                SELECT ?, ?, ?, ?;
             """,
-            (jobID, timestamp, selectedResume, email, jobID)
+            (jobID, timestamp, selectedResume, email)
         )
         if cursor.rowcount != 1:
             print(f"JobID {jobID} already exists in apply queue. No duplicate added.")
