@@ -120,10 +120,10 @@ def addToApplyQueue(jobID, selectedResume, email):
         timestamp = int(datetime.now(timezone.utc).timestamp())
         cursor.execute(
             """
-                INSERT INTO applyQueue (id, timeOfArrival, selectedResume, email)
+                INSERT INTO applyQueue (jobID, timeOfArrival, selectedResume, email)
                 SELECT ?, ?, ?, ?
                 WHERE NOT EXISTS (
-                    SELECT 1 FROM applyQueue WHERE id = ?
+                    SELECT 1 FROM applyQueue WHERE jobID = ?
                 );
             """,
             (jobID, timestamp, selectedResume, email, jobID)

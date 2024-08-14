@@ -23,14 +23,14 @@
 -- );
 
 -- -- Create applyQueue table
--- CREATE TABLE applyQueue (
---     id VARCHAR(36) NOT NULL,
---     timeOfArrival BIGINT NOT NULL,
---     selectedResume VARCHAR(255) NOT NULL,
---     email VARCHAR(255) NOT NULL,
---     applyQueueID INT IDENTITY(1,1) PRIMARY KEY
--- );
--- SELECT * FROM applyQueue;
+CREATE TABLE applyQueue (
+    applyQueueID INT IDENTITY(1,1) PRIMARY KEY,
+    jobID VARCHAR(36) NOT NULL,
+    timeOfArrival BIGINT NOT NULL,
+    selectedResume VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+SELECT * FROM applyQueue;
 
 -- -- Create scoreBoard table
 -- CREATE TABLE scoreBoard (
